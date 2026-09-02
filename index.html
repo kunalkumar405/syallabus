@@ -1,1 +1,311 @@
-# syallabus
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 12 Syllabus Tracker</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* slate-100 */
+        }
+        
+        /* Custom checkbox styles */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            background: white;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 8px;
+        }
+        
+        .checkbox-container:hover {
+            background: #f9fafb;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            height: 24px;
+            width: 24px;
+            background-color: #f3f4f6;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #e5e7eb;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #10b981; /* emerald-500 */
+            border-color: #10b981;
+        }
+
+        .checkmark:after {
+            content: "";
+            display: none;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-bottom: 2px;
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        /* Text styling for checked items */
+        .checkbox-container .chapter-text {
+            color: #374151;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-container input:checked ~ .chapter-text {
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+        /* Smooth Progress Bar */
+        #progress-fill {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-20">
+
+    <div class="max-w-4xl mx-auto px-4 pt-10">
+        
+        <!-- Dashboard Header -->
+        <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Class 12 Syllabus Tracker</h1>
+            <p class="text-slate-500 mb-8">Physics, Chemistry, and Biology (Board Exams)</p>
+
+            <!-- Overall Progress Stats -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                <div>
+                    <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Overall Progress</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="percentage-text" class="text-4xl font-extrabold text-emerald-600">0%</span>
+                        <span class="text-slate-500 font-medium">Completed</span>
+                    </div>
+                </div>
+                
+                <div class="text-right flex gap-6">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-slate-800" id="completed-count">0</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase">Done</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-rose-500" id="remaining-count">0</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase">Remaining</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-100 rounded-full h-4 mb-2 overflow-hidden shadow-inner">
+                <div id="progress-fill" class="bg-emerald-500 h-4 rounded-full" style="width: 0%"></div>
+            </div>
+            <p class="text-sm text-slate-500 text-center mt-3 font-medium"><span id="remaining-percent" class="text-rose-500 font-bold">100%</span> syllabus pending</p>
+        </div>
+
+        <!-- Subjects Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Physics Column -->
+            <div class="subject-col">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h2 class="text-xl font-bold text-blue-600 flex items-center gap-2">
+                        <span class="text-2xl">⚡</span> Physics
+                    </h2>
+                    <span id="phy-stats" class="text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">0/14</span>
+                </div>
+                <div id="physics-list"></div>
+            </div>
+
+            <!-- Chemistry Column -->
+            <div class="subject-col">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h2 class="text-xl font-bold text-purple-600 flex items-center gap-2">
+                        <span class="text-2xl">🧪</span> Chemistry
+                    </h2>
+                    <span id="chem-stats" class="text-sm font-semibold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">0/10</span>
+                </div>
+                <div id="chemistry-list"></div>
+            </div>
+
+            <!-- Biology Column -->
+            <div class="subject-col">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h2 class="text-xl font-bold text-green-600 flex items-center gap-2">
+                        <span class="text-2xl">🧬</span> Biology
+                    </h2>
+                    <span id="bio-stats" class="text-sm font-semibold bg-green-100 text-green-700 px-3 py-1 rounded-full">0/13</span>
+                </div>
+                <div id="biology-list"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Class 12 NCERT Latest Syllabus
+        const syllabus = {
+            physics: [
+                { id: "phy-1", name: "Electric Charges and Fields" },
+                { id: "phy-2", name: "Electrostatic Potential and Capacitance" },
+                { id: "phy-3", name: "Current Electricity" },
+                { id: "phy-4", name: "Moving Charges and Magnetism" },
+                { id: "phy-5", name: "Magnetism and Matter" },
+                { id: "phy-6", name: "Electromagnetic Induction" },
+                { id: "phy-7", name: "Alternating Current" },
+                { id: "phy-8", name: "Electromagnetic Waves" },
+                { id: "phy-9", name: "Ray Optics and Optical Instruments" },
+                { id: "phy-10", name: "Wave Optics" },
+                { id: "phy-11", name: "Dual Nature of Radiation and Matter" },
+                { id: "phy-12", name: "Atoms" },
+                { id: "phy-13", name: "Nuclei" },
+                { id: "phy-14", name: "Semiconductor Electronics" }
+            ],
+            chemistry: [
+                { id: "chem-1", name: "Solutions" },
+                { id: "chem-2", name: "Electrochemistry" },
+                { id: "chem-3", name: "Chemical Kinetics" },
+                { id: "chem-4", name: "d -and f -Block Elements" },
+                { id: "chem-5", name: "Coordination Compounds" },
+                { id: "chem-6", name: "Haloalkanes and Haloarenes" },
+                { id: "chem-7", name: "Alcohols, Phenols and Ethers" },
+                { id: "chem-8", name: "Aldehydes, Ketones and Carboxylic Acids" },
+                { id: "chem-9", name: "Amines" },
+                { id: "chem-10", name: "Biomolecules" }
+            ],
+            biology: [
+                { id: "bio-1", name: "Sexual Reproduction in Flowering Plants" },
+                { id: "bio-2", name: "Human Reproduction" },
+                { id: "bio-3", name: "Reproductive Health" },
+                { id: "bio-4", name: "Principles of Inheritance and Variation" },
+                { id: "bio-5", name: "Molecular Basis of Inheritance" },
+                { id: "bio-6", name: "Evolution" },
+                { id: "bio-7", name: "Human Health and Disease" },
+                { id: "bio-8", name: "Microbes in Human Welfare" },
+                { id: "bio-9", name: "Biotechnology: Principles and Processes" },
+                { id: "bio-10", name: "Biotechnology and its Applications" },
+                { id: "bio-11", name: "Organisms and Populations" },
+                { id: "bio-12", name: "Ecosystem" },
+                { id: "bio-13", name: "Biodiversity and Conservation" }
+            ]
+        };
+
+        // Load saved progress from local storage, or create an empty object if none exists
+        let completedChapters = JSON.parse(localStorage.getItem('class12_progress')) || {};
+
+        function saveProgress() {
+            localStorage.setItem('class12_progress', JSON.stringify(completedChapters));
+            updateDashboard();
+        }
+
+        function toggleChapter(id) {
+            if (completedChapters[id]) {
+                delete completedChapters[id]; // Uncheck
+            } else {
+                completedChapters[id] = true; // Check
+            }
+            saveProgress();
+        }
+
+        function renderList(subject, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Clear existing
+
+            syllabus[subject].forEach((chapter, index) => {
+                const isChecked = completedChapters[chapter.id] ? 'checked' : '';
+                
+                const label = document.createElement('label');
+                label.className = 'checkbox-container shadow-sm';
+                label.innerHTML = `
+                    <input type="checkbox" id="${chapter.id}" onchange="toggleChapter('${chapter.id}')" ${isChecked}>
+                    <span class="checkmark"></span>
+                    <span class="chapter-text"><span class="text-xs text-slate-400 font-bold mr-1">${index + 1}.</span> ${chapter.name}</span>
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function updateDashboard() {
+            let totalChapters = 0;
+            let totalCompleted = 0;
+            
+            // Calculate Subject Wise stats
+            const stats = {
+                physics: { total: syllabus.physics.length, done: 0 },
+                chemistry: { total: syllabus.chemistry.length, done: 0 },
+                biology: { total: syllabus.biology.length, done: 0 }
+            };
+
+            // Loop through all subjects and check completion
+            for (const subject in syllabus) {
+                totalChapters += syllabus[subject].length;
+                syllabus[subject].forEach(chapter => {
+                    if (completedChapters[chapter.id]) {
+                        totalCompleted++;
+                        stats[subject].done++;
+                    }
+                });
+            }
+
+            // Calculations
+            const remaining = totalChapters - totalCompleted;
+            const percentage = Math.round((totalCompleted / totalChapters) * 100);
+            const remainingPercentage = 100 - percentage;
+
+            // Update DOM Elements
+            document.getElementById('percentage-text').innerText = `${percentage}%`;
+            document.getElementById('completed-count').innerText = totalCompleted;
+            document.getElementById('remaining-count').innerText = remaining;
+            
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+            document.getElementById('remaining-percent').innerText = `${remainingPercentage}%`;
+
+            // Update Subject Badges
+            document.getElementById('phy-stats').innerText = `${stats.physics.done}/${stats.physics.total}`;
+            document.getElementById('chem-stats').innerText = `${stats.chemistry.done}/${stats.chemistry.total}`;
+            document.getElementById('bio-stats').innerText = `${stats.biology.done}/${stats.biology.total}`;
+        }
+
+        // Initialize App
+        window.onload = function() {
+            renderList('physics', 'physics-list');
+            renderList('chemistry', 'chemistry-list');
+            renderList('biology', 'biology-list');
+            updateDashboard();
+        };
+    </script>
+</body>
+</html>
