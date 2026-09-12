@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#4f46e5">
+    <meta id="theme-color-meta" name="theme-color" content="#4f46e5">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Tracker">
@@ -161,6 +161,7 @@
 
         body.focus-active {
             overflow: hidden;
+            background-color: #000000; /* Ensure body turns black too */
         }
     </style>
 </head>
@@ -516,6 +517,7 @@
         const overlay = document.getElementById('focus-overlay');
         const display = document.getElementById('focus-time-display');
         const doneMsg = document.getElementById('focus-done-msg');
+        const themeColorMeta = document.getElementById('theme-color-meta');
         
         let focusInterval;
         let totalSeconds = 0;
@@ -561,6 +563,17 @@
             overlay.classList.remove('hidden');
             overlay.classList.add('flex'); // Keep flex for centering
             document.body.classList.add('focus-active'); 
+            themeColorMeta.setAttribute('content', '#000000'); // Make status bar black
+            
+            // Try to request fullscreen
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.log(err));
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen().catch(err => console.log(err));
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen().catch(err => console.log(err));
+            }
             
             // Scroll to top to ensure layout consistency on mobile
             window.scrollTo(0, 0);
@@ -607,10 +620,23 @@
         function stopFocusTimer() {
             clearInterval(focusInterval);
             overlay.classList.add('opacity-0');
+            
+            // Exit fullscreen if active
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE11 */
+                    document.msExitFullscreen();
+                }
+            }
+
             setTimeout(() => {
                 overlay.classList.remove('flex'); 
                 overlay.classList.add('hidden');
                 document.body.classList.remove('focus-active');
+                themeColorMeta.setAttribute('content', '#4f46e5'); // Restore original theme color
             }, 500);
         }
 
