@@ -143,7 +143,7 @@
             background-color: #000000; 
         }
         
-        /* Fixed Focus Text Typography to match reference image */
+        /* Fixed Focus Text Typography */
         .focus-text {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: bold;
@@ -157,11 +157,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: color 0.3s ease;
         }
 
         body.focus-active {
             overflow: hidden;
-            background-color: #000000; /* Ensure body turns black too */
+            background-color: #000000; 
+        }
+
+        /* Added specific blinking animation for paused state */
+        @keyframes blinker {
+            50% { opacity: 0.5; }
+        }
+        .focus-paused .focus-text {
+            animation: blinker 2s linear infinite;
+            color: #cbd5e1; /* Subtle dimming when paused */
         }
     </style>
 </head>
@@ -210,6 +220,14 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                         </button>
+                        
+                        <!-- Daily Analytics Display -->
+                        <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Today's Focus:</span>
+                            <span id="today-study-time" class="text-sm font-black text-indigo-600">0h 0m</span>
+                            <span class="text-slate-300 mx-1">|</span>
+                            <span id="today-sessions-count" class="text-xs font-semibold text-slate-500">0 Sessions</span>
+                        </div>
                     </div>
                 </div>
 
@@ -340,18 +358,52 @@
     <!-- Fullscreen Focus Timer Overlay -->
     <div id="focus-overlay" class="fixed inset-0 focus-bg z-50 hidden flex-col items-center justify-center opacity-0 transition-opacity duration-500">
         
-        <button onclick="stopFocusTimer()" class="absolute top-6 sm:top-8 right-6 sm:right-8 text-white/20 hover:text-white/80 transition-all p-3 rounded-full hover:bg-white/10 group flex items-center gap-2">
-            <span class="text-sm font-medium tracking-wide opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block">Exit (ESC)</span>
-            <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-
         <!-- The Massive Centered Timer Text -->
         <div id="focus-time-display" class="focus-text">
             2:00:00
         </div>
         
-        <div id="focus-done-msg" class="absolute bottom-16 sm:bottom-20 text-emerald-400 font-bold text-xl sm:text-2xl tracking-widest uppercase hidden animate-bounce text-center px-4">
+        <div id="focus-done-msg" class="absolute top-1/4 text-emerald-400 font-bold text-xl sm:text-2xl tracking-widest uppercase hidden animate-bounce text-center px-4">
             Session Completed!
+        </div>
+
+        <!-- Professional Controls Bar (Replaces old top-right exit button) -->
+        <div id="focus-controls" class="absolute bottom-12 sm:bottom-16 w-full px-6 flex flex-col items-center gap-6">
+            
+            <!-- Real-time session stats -->
+            <div id="focus-session-stats" class="text-slate-400 text-xs sm:text-sm font-medium tracking-wide">
+                Session Active
+            </div>
+
+            <div class="flex items-center gap-4 sm:gap-6">
+                <!-- Pause/Resume Button -->
+                <button id="toggle-pause-btn" onclick="togglePauseFocusTimer()" class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-6 py-3.5 rounded-full font-bold transition-all active:scale-95 min-w-[140px] shadow-lg">
+                    <svg id="icon-pause" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    <svg id="icon-resume" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <span id="text-pause-resume">Pause</span>
+                </button>
+                
+                <!-- Stop Button -->
+                <button onclick="promptStopTimer()" class="flex items-center justify-center p-3.5 sm:px-6 bg-rose-900/40 border border-rose-800 hover:bg-rose-600 text-white rounded-full font-bold transition-all active:scale-95 shadow-lg group">
+                    <svg class="w-5 h-5 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>
+                    <span class="hidden sm:inline">End Session</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stop Confirmation Modal (Custom alert alternative) -->
+    <div id="stop-confirm-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4 transition-opacity opacity-0">
+        <div class="bg-slate-900 border border-slate-700 p-6 sm:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl transform scale-95 transition-transform duration-300" id="stop-modal-content">
+            <div class="w-16 h-16 bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <h3 class="text-white text-xl sm:text-2xl font-bold mb-2">End Session Early?</h3>
+            <p class="text-slate-400 text-sm mb-8">Your studied time will be saved, but the timer will stop.</p>
+            <div class="flex gap-3">
+                <button onclick="cancelStopTimer()" class="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">Resume</button>
+                <button onclick="confirmStopTimer()" class="flex-1 px-4 py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold transition-colors shadow-lg">End Session</button>
+            </div>
         </div>
     </div>
 
@@ -477,12 +529,10 @@
             const now = new Date();
             let targetYear = now.getFullYear();
             
-            // If we are past Feb 1st this year, target next year
             if (now.getMonth() > 1 || (now.getMonth() === 1 && now.getDate() >= 1)) {
                 targetYear++;
             }
             
-            // Set exact target: Feb 1st, 00:00:00 (Midnight)
             const targetDate = new Date(`February 1, ${targetYear} 00:00:00`).getTime();
 
             const timerTick = () => {
@@ -511,16 +561,109 @@
             setInterval(timerTick, 1000);
         }
 
-        // --- 2. FOCUS TIMER LOGIC ---
+        // --- NEW: Persistent Study Analytics ---
+        function getLocalISODate() {
+            const now = new Date();
+            return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+        }
+
+        function loadAnalytics() {
+            const rawData = localStorage.getItem('class12_study_analytics');
+            let data = rawData ? JSON.parse(rawData) : {};
+            const todayStr = getLocalISODate();
+
+            if (!data[todayStr]) {
+                data[todayStr] = { totalTimeSeconds: 0, sessionsCount: 0, sessions: [] };
+            }
+            
+            // Update UI
+            const todayData = data[todayStr];
+            let h = Math.floor(todayData.totalTimeSeconds / 3600);
+            let m = Math.floor((todayData.totalTimeSeconds % 3600) / 60);
+            document.getElementById('today-study-time').innerText = `${h}h ${m}m`;
+            document.getElementById('today-sessions-count').innerText = `${todayData.sessionsCount} Session${todayData.sessionsCount !== 1 ? 's' : ''}`;
+            
+            return data;
+        }
+
+        function saveSessionAnalytics(startMs, endMs, activeDurationSeconds) {
+            if (activeDurationSeconds < 10) return; // Ignore very short accidental sessions (<10s)
+            
+            let data = loadAnalytics();
+            const dateStr = getLocalISODate(); // Ensures it gets saved to the day it finished
+
+            if (!data[dateStr]) {
+                data[dateStr] = { totalTimeSeconds: 0, sessionsCount: 0, sessions: [] };
+            }
+
+            data[dateStr].totalTimeSeconds += Math.floor(activeDurationSeconds);
+            data[dateStr].sessionsCount += 1;
+            data[dateStr].sessions.push({
+                start: startMs,
+                end: endMs,
+                activeDuration: activeDurationSeconds
+            });
+
+            localStorage.setItem('class12_study_analytics', JSON.stringify(data));
+            loadAnalytics(); // Refresh UI
+        }
+
+
+        // --- NEW: Screen Wake Lock API ---
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock released');
+                    });
+                    console.log('Wake Lock acquired');
+                }
+            } catch (err) {
+                console.error(`Wake Lock error: ${err.name}, ${err.message}`);
+            }
+        }
+
+        async function releaseWakeLock() {
+            if (wakeLock !== null) {
+                await wakeLock.release();
+                wakeLock = null;
+            }
+        }
+
+        // Re-acquire lock if page becomes visible while timer is running
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && document.body.classList.contains('focus-active') && !isTimerPaused) {
+                await requestWakeLock();
+            }
+        });
+
+
+        // --- 2. ENHANCED FOCUS TIMER LOGIC ---
         const modal = document.getElementById('focus-setup-modal');
         const modalContent = document.getElementById('focus-modal-content');
         const overlay = document.getElementById('focus-overlay');
         const display = document.getElementById('focus-time-display');
         const doneMsg = document.getElementById('focus-done-msg');
         const themeColorMeta = document.getElementById('theme-color-meta');
+        const controls = document.getElementById('focus-controls');
         
+        // Modal for Confirm Stop
+        const stopModal = document.getElementById('stop-confirm-modal');
+        const stopModalContent = document.getElementById('stop-modal-content');
+
         let focusInterval;
-        let totalSeconds = 0;
+        let targetTotalSeconds = 0;
+        
+        // Accurate timing variables
+        let sessionStartTimeMs = 0;
+        let expectedEndTimeMs = 0;
+        let totalPausedTimeMs = 0;
+        let lastPauseTimeMs = 0;
+        let isTimerPaused = false;
+        let isTimerFinished = false;
 
         function openFocusSetup() {
             modal.classList.remove('hidden');
@@ -548,55 +691,73 @@
             if (minutes < 0) minutes = 0;
             if (hours === 0 && minutes === 0) return; 
 
-            totalSeconds = (hours * 3600) + (minutes * 60);
+            targetTotalSeconds = (hours * 3600) + (minutes * 60);
             
             closeFocusSetup();
             activateFocusMode();
         }
 
-        function activateFocusMode() {
+        async function activateFocusMode() {
+            // Reset state
             doneMsg.classList.add('hidden');
+            controls.classList.remove('hidden');
             display.classList.remove('text-emerald-400');
             display.classList.add('text-white');
-            updateDisplayString();
-
-            overlay.classList.remove('hidden');
-            overlay.classList.add('flex'); // Keep flex for centering
-            document.body.classList.add('focus-active'); 
-            themeColorMeta.setAttribute('content', '#000000'); // Make status bar black
+            document.getElementById('focus-session-stats').innerText = "Session Active";
             
-            // Try to request fullscreen
+            // Accurate Timing Initialization
+            sessionStartTimeMs = Date.now();
+            expectedEndTimeMs = sessionStartTimeMs + (targetTotalSeconds * 1000);
+            totalPausedTimeMs = 0;
+            isTimerPaused = false;
+            isTimerFinished = false;
+            updatePauseUI(); // Reset buttons
+
+            updateDisplayString(targetTotalSeconds);
+
+            // UI Transitions
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            document.body.classList.add('focus-active'); 
+            themeColorMeta.setAttribute('content', '#000000'); 
+            
+            // Fullscreen attempt
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
                 elem.requestFullscreen().catch(err => console.log(err));
-            } else if (elem.webkitRequestFullscreen) { /* Safari */
+            } else if (elem.webkitRequestFullscreen) {
                 elem.webkitRequestFullscreen().catch(err => console.log(err));
-            } else if (elem.msRequestFullscreen) { /* IE11 */
-                elem.msRequestFullscreen().catch(err => console.log(err));
             }
             
-            // Scroll to top to ensure layout consistency on mobile
             window.scrollTo(0, 0);
+            await requestWakeLock();
 
             setTimeout(() => {
                 overlay.classList.remove('opacity-0');
             }, 10);
 
             clearInterval(focusInterval);
-            focusInterval = setInterval(() => {
-                totalSeconds--;
-                if (totalSeconds <= 0) {
-                    totalSeconds = 0;
-                    timerFinished();
-                }
-                updateDisplayString();
-            }, 1000);
+            focusInterval = setInterval(focusTick, 200); // Check multiple times a second for better UI responsiveness
         }
 
-        function updateDisplayString() {
+        function focusTick() {
+            if (isTimerPaused || isTimerFinished) return;
+
+            const now = Date.now();
+            const remainingMs = expectedEndTimeMs - now;
+            const remainingSeconds = Math.ceil(remainingMs / 1000);
+
+            if (remainingMs <= 0) {
+                handleTimerCompletion();
+            } else {
+                updateDisplayString(remainingSeconds);
+            }
+        }
+
+        function updateDisplayString(totalSeconds) {
             let h = Math.floor(totalSeconds / 3600);
             let m = Math.floor((totalSeconds % 3600) / 60);
-            let s = totalSeconds % 60;
+            let s = Math.floor(totalSeconds % 60);
 
             let timeString = "";
             if (h > 0) {
@@ -609,26 +770,126 @@
             display.innerText = timeString;
         }
 
-        function timerFinished() {
+        function togglePauseFocusTimer() {
+            if (isTimerFinished) return;
+
+            if (isTimerPaused) {
+                // Resume
+                const pauseDuration = Date.now() - lastPauseTimeMs;
+                totalPausedTimeMs += pauseDuration;
+                expectedEndTimeMs += pauseDuration; // Push end time forward
+                isTimerPaused = false;
+                document.getElementById('focus-session-stats').innerText = "Session Active";
+                
+                requestWakeLock(); // Re-acquire on resume
+            } else {
+                // Pause
+                isTimerPaused = true;
+                lastPauseTimeMs = Date.now();
+                document.getElementById('focus-session-stats').innerText = "Session Paused";
+                
+                releaseWakeLock(); // Save battery while paused
+            }
+            
+            updatePauseUI();
+        }
+
+        function updatePauseUI() {
+            const btnText = document.getElementById('text-pause-resume');
+            const iconPause = document.getElementById('icon-pause');
+            const iconResume = document.getElementById('icon-resume');
+            
+            if (isTimerPaused) {
+                document.body.classList.add('focus-paused');
+                btnText.innerText = "Resume";
+                iconPause.classList.add('hidden');
+                iconResume.classList.remove('hidden');
+            } else {
+                document.body.classList.remove('focus-paused');
+                btnText.innerText = "Pause";
+                iconPause.classList.remove('hidden');
+                iconResume.classList.add('hidden');
+            }
+        }
+
+        function handleTimerCompletion() {
+            isTimerFinished = true;
             clearInterval(focusInterval);
             display.innerText = "0:00";
             display.classList.remove('text-white');
             display.classList.add('text-emerald-400'); 
+            
             doneMsg.classList.remove('hidden');
+            document.getElementById('focus-session-stats').innerText = "Target Achieved!";
+            
+            // Hide pause button when done, keep Stop button as "Exit"
+            document.getElementById('toggle-pause-btn').classList.add('hidden');
+            
+            releaseWakeLock();
+
+            // Calculate exact active time
+            const actualDurationSeconds = targetTotalSeconds; // Completed fully
+            saveSessionAnalytics(sessionStartTimeMs, Date.now(), actualDurationSeconds);
         }
 
-        function stopFocusTimer() {
+        function promptStopTimer() {
+            if (isTimerFinished) {
+                // If already finished, just exit without confirming
+                finalizeExit();
+                return;
+            }
+            
+            // Implicitly pause timer while asking
+            if (!isTimerPaused) togglePauseFocusTimer(); 
+
+            // Show custom confirmation modal
+            stopModal.classList.remove('hidden');
+            setTimeout(() => {
+                stopModal.classList.remove('opacity-0');
+                stopModalContent.classList.remove('scale-95');
+                stopModalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function cancelStopTimer() {
+            stopModal.classList.add('opacity-0');
+            stopModalContent.classList.remove('scale-100');
+            stopModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                stopModal.classList.add('hidden');
+            }, 300);
+            
+            // Note: Does not automatically resume, user must hit 'Resume' on the main control
+        }
+
+        function confirmStopTimer() {
+            // Hide modal instantly
+            stopModal.classList.add('hidden');
+            stopModal.classList.add('opacity-0');
+            
+            // Save partial analytics
+            const activeDurationMs = Date.now() - sessionStartTimeMs - totalPausedTimeMs;
+            const activeDurationSeconds = Math.floor(activeDurationMs / 1000);
+            
+            saveSessionAnalytics(sessionStartTimeMs, Date.now(), activeDurationSeconds);
+            
+            finalizeExit();
+        }
+
+        function finalizeExit() {
             clearInterval(focusInterval);
+            isTimerFinished = true;
+            document.body.classList.remove('focus-paused');
+            
+            releaseWakeLock();
+            
             overlay.classList.add('opacity-0');
             
-            // Exit fullscreen if active
-            if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
                 if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { /* Safari */
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) { /* IE11 */
-                    document.msExitFullscreen();
+                    document.exitFullscreen().catch(()=>{});
+                } else if (document.webkitExitFullscreen) { 
+                    document.webkitExitFullscreen().catch(()=>{});
                 }
             }
 
@@ -636,20 +897,22 @@
                 overlay.classList.remove('flex'); 
                 overlay.classList.add('hidden');
                 document.body.classList.remove('focus-active');
-                themeColorMeta.setAttribute('content', '#4f46e5'); // Restore original theme color
+                themeColorMeta.setAttribute('content', '#4f46e5'); 
+                
+                // Reset toggle button visibility for next time
+                document.getElementById('toggle-pause-btn').classList.remove('hidden');
             }, 500);
         }
 
+        // Removed Escape key listener for exiting focus to enforce proper stop confirmation workflow
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (!overlay.classList.contains('hidden')) stopFocusTimer();
                 if (!modal.classList.contains('hidden')) closeFocusSetup();
             }
         });
 
+
         // --- 3. PWA (DOWNLOAD AS APP) LOGIC ---
-        
-        // Dynamically create a Web App Manifest in memory
         function initPWA() {
             const manifestJSON = {
                 "name": "Class 12 Tracker",
@@ -659,7 +922,6 @@
                 "background_color": "#f8fafc",
                 "theme_color": "#4f46e5",
                 "icons": [{
-                    // A simple SVG icon encoded to base64
                     "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzRmNDZlNSIgcng9IjQ4Ii8+PHBhdGggZD0iTTUwIDEwMEwzNSA4NWwyNSAyNSA3MC03MC0xNS0xNXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
                     "sizes": "192x192",
                     "type": "image/svg+xml"
@@ -668,7 +930,6 @@
             const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/manifest+json'});
             document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
 
-            // Register a dummy Service Worker to trick browsers into allowing installation
             const swCode = `
                 self.addEventListener('install', (e) => self.skipWaiting());
                 self.addEventListener('activate', (e) => self.clients.claim());
@@ -679,11 +940,9 @@
                 navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>console.log('SW registration bypassed in preview'));
             }
 
-            // Handle Install Prompt
             let deferredPrompt;
             const installBtn = document.getElementById('install-app-btn');
             
-            // Only show install button if not already installed
             if (!window.matchMedia('(display-mode: standalone)').matches) {
                 window.addEventListener('beforeinstallprompt', (e) => {
                     e.preventDefault();
@@ -713,6 +972,7 @@
             renderList('biology', 'biology-list');
             updateDashboard();
             initExactTimer(); 
+            loadAnalytics(); // Load today's stats on init
             initPWA();
         };
     </script>
