@@ -25,7 +25,6 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* Custom checkbox styles */
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -103,7 +102,6 @@
             display: block;
         }
 
-        /* Text styling for checked items */
         .checkbox-container .chapter-text {
             color: #334155;
             font-weight: 500;
@@ -138,12 +136,10 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Pure pitch black background for focus */
         .focus-bg {
             background-color: #000000; 
         }
         
-        /* Fixed Focus Text Typography */
         .focus-text {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: bold;
@@ -165,13 +161,22 @@
             background-color: #000000; 
         }
 
-        /* Added specific blinking animation for paused state */
         @keyframes blinker {
             50% { opacity: 0.5; }
         }
         .focus-paused .focus-text {
             animation: blinker 2s linear infinite;
-            color: #cbd5e1; /* Subtle dimming when paused */
+            color: #cbd5e1;
+        }
+
+        /* Auto-hide transition for controls */
+        #focus-controls, #focus-hint {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        
+        /* Bar chart animation */
+        .chart-bar {
+            transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
     </style>
 </head>
@@ -180,18 +185,15 @@
 
     <div class="max-w-5xl mx-auto px-3 sm:px-4 pt-6 md:pt-12 relative z-10" id="main-content">
         
-        <!-- Dashboard Header -->
         <div class="glass-panel rounded-3xl p-5 sm:p-6 md:p-10 shadow-lg border border-slate-200 mb-8 sm:mb-10 relative overflow-hidden">
             
-            <!-- Install App Button (Hidden by default, shown via JS if PWA is supported) -->
             <button id="install-app-btn" class="hidden absolute top-4 sm:top-6 right-4 sm:right-6 bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 z-20">
                 <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Install App
             </button>
 
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 lg:gap-8 mb-2">
-                <!-- Titles and Progress -->
-                <div class="w-full lg:w-[45%] mt-6 sm:mt-0">
+                <div class="w-full lg:w-[50%] mt-6 sm:mt-0">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-2 tracking-tight leading-tight">Mission Board <span class="text-indigo-600 block sm:inline">Exams</span></h1>
                     
                     <p class="text-slate-500 font-medium mb-5 sm:mb-6 text-xs sm:text-sm md:text-base italic border-l-4 border-indigo-400 pl-3">
@@ -213,72 +215,76 @@
                     </div>
                     
                     <div class="mt-6 sm:mt-8">
-                        <button onclick="openFocusSetup()" class="group relative inline-flex items-center justify-center px-4 py-3 sm:px-6 sm:py-3 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:shadow-md active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 w-full sm:w-auto text-sm sm:text-base">
+                        <button onclick="openFocusSetup()" class="group relative inline-flex items-center justify-center px-4 py-3 sm:px-6 sm:py-3.5 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:shadow-md active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 w-full sm:w-auto text-sm sm:text-base">
                             <span class="mr-2 text-lg sm:text-xl">⏱️</span> 
                             Start Deep Study Session
                             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                         </button>
-                        
-                        <!-- Daily Analytics Display -->
-                        <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Today's Focus:</span>
-                            <span id="today-study-time" class="text-sm font-black text-indigo-600">0h 0m</span>
-                            <span class="text-slate-300 mx-1">|</span>
-                            <span id="today-sessions-count" class="text-xs font-semibold text-slate-500">0 Sessions</span>
-                        </div>
                     </div>
                 </div>
 
-                <div class="w-full lg:w-auto bg-gradient-to-br from-slate-50 to-indigo-50/30 rounded-2xl p-4 sm:p-6 border border-indigo-100/50 shadow-sm relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-indigo-100 rounded-full blur-2xl sm:blur-3xl opacity-40 group-hover:opacity-60 transition-opacity -mr-8 -mt-8 pointer-events-none"></div>
+                <div class="w-full lg:w-[45%] flex flex-col gap-4">
                     
-                    <div class="flex items-center justify-center gap-2 mb-4 sm:mb-5 relative z-10">
-                        <span class="text-xl sm:text-2xl">🎯</span>
-                        <h3 class="text-xs sm:text-sm font-bold text-indigo-900 uppercase tracking-widest">Target: Feb 1st</h3>
+                    <!-- 7-Day Analytics Card -->
+                    <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Focus</h3>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="today-study-time" class="text-xl sm:text-2xl font-black text-indigo-600">0h 0m</span>
+                                    <span id="today-sessions-count" class="text-xs font-semibold text-slate-400">0 Sessions</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Last 7 Days</h3>
+                            </div>
+                        </div>
+                        
+                        <!-- 7-Day Chart -->
+                        <div class="flex items-end justify-between gap-1 sm:gap-2 h-16 sm:h-20" id="weekly-chart">
+                            <!-- Bars generated by JS -->
+                        </div>
                     </div>
-                    
-                    <!-- Mobile Optimized Timer Grid -->
-                    <div class="flex justify-center items-center gap-1.5 sm:gap-3 text-center relative z-10">
-                        <!-- Days -->
-                        <div class="bg-white px-2 py-3 sm:px-4 sm:py-4 rounded-xl shadow-sm border border-indigo-50 min-w-[65px] sm:min-w-[80px] transform transition hover:scale-105">
-                            <span id="timer-days" class="text-2xl sm:text-4xl font-black text-indigo-600 block leading-none mb-1">00</span>
-                            <p class="text-[9px] sm:text-xs font-bold text-indigo-400 uppercase tracking-wider">Days</p>
-                        </div>
-                        
-                        <span class="text-xl sm:text-2xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
-                        
-                        <!-- Hours -->
-                        <div class="bg-white px-2 py-3 sm:px-4 sm:py-4 rounded-xl shadow-sm border border-indigo-50 min-w-[65px] sm:min-w-[80px] transform transition hover:scale-105">
-                            <span id="timer-hours" class="text-2xl sm:text-4xl font-black text-indigo-600 block leading-none mb-1">00</span>
-                            <p class="text-[9px] sm:text-xs font-bold text-indigo-400 uppercase tracking-wider">Hrs</p>
-                        </div>
-                        
-                        <span class="text-xl sm:text-2xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
-                        
-                        <!-- Minutes -->
-                        <div class="bg-white px-2 py-3 sm:px-4 sm:py-4 rounded-xl shadow-sm border border-indigo-50 min-w-[65px] sm:min-w-[80px] transform transition hover:scale-105">
-                            <span id="timer-minutes" class="text-2xl sm:text-4xl font-black text-indigo-600 block leading-none mb-1">00</span>
-                            <p class="text-[9px] sm:text-xs font-bold text-indigo-400 uppercase tracking-wider">Mins</p>
-                        </div>
 
-                        <span class="text-xl sm:text-2xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                    <!-- Target Countdown -->
+                    <div class="bg-gradient-to-br from-white to-indigo-50/50 rounded-2xl p-4 sm:p-5 border border-indigo-100/50 shadow-sm relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-100 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity -mr-8 -mt-8 pointer-events-none"></div>
                         
-                        <!-- Seconds -->
-                        <div class="bg-white px-2 py-3 sm:px-4 sm:py-4 rounded-xl shadow-sm border border-rose-50 min-w-[65px] sm:min-w-[80px] transform transition hover:scale-105">
-                            <span id="timer-seconds" class="text-2xl sm:text-4xl font-black text-rose-500 block leading-none mb-1">00</span>
-                            <p class="text-[9px] sm:text-xs font-bold text-rose-400 uppercase tracking-wider">Secs</p>
+                        <div class="flex items-center justify-center gap-2 mb-3 sm:mb-4 relative z-10">
+                            <span class="text-lg sm:text-xl">🎯</span>
+                            <h3 class="text-xs sm:text-sm font-bold text-indigo-900 uppercase tracking-widest">Target: Feb 1st</h3>
+                        </div>
+                        
+                        <div class="flex justify-center items-center gap-1.5 sm:gap-3 text-center relative z-10">
+                            <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-sm border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
+                                <span id="timer-days" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
+                                <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Days</p>
+                            </div>
+                            <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                            <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-sm border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
+                                <span id="timer-hours" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
+                                <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Hrs</p>
+                            </div>
+                            <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                            <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-sm border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
+                                <span id="timer-minutes" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
+                                <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Mins</p>
+                            </div>
+                            <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                            <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-sm border border-rose-50 min-w-[60px] sm:min-w-[70px]">
+                                <span id="timer-seconds" class="text-xl sm:text-3xl font-black text-rose-500 block leading-none mb-1">00</span>
+                                <p class="text-[9px] sm:text-[10px] font-bold text-rose-400 uppercase tracking-wider">Secs</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Subjects Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
-            
-            <!-- Physics Column -->
+            <!-- Physics -->
             <div class="subject-col bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
                     <h2 class="text-lg sm:text-xl font-extrabold text-blue-600 flex items-center gap-2">
@@ -292,7 +298,7 @@
                 <div id="physics-list" class="space-y-1 sm:space-y-2"></div>
             </div>
 
-            <!-- Chemistry Column -->
+            <!-- Chemistry -->
             <div class="subject-col bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
                     <h2 class="text-lg sm:text-xl font-extrabold text-purple-600 flex items-center gap-2">
@@ -306,7 +312,7 @@
                 <div id="chemistry-list" class="space-y-1 sm:space-y-2"></div>
             </div>
 
-            <!-- Biology Column -->
+            <!-- Biology -->
             <div class="subject-col bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 md:col-span-2 lg:col-span-1">
                 <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
                     <h2 class="text-lg sm:text-xl font-extrabold text-green-600 flex items-center gap-2">
@@ -319,11 +325,9 @@
                 </div>
                 <div id="biology-list" class="space-y-1 sm:space-y-2"></div>
             </div>
-
         </div>
     </div>
 
-    <!-- Focus Timer Setup Modal -->
     <div id="focus-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4 transition-opacity opacity-0">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl transform scale-95 transition-transform duration-300" id="focus-modal-content">
             <div class="flex justify-between items-center mb-5 sm:mb-6">
@@ -333,16 +337,14 @@
                 </button>
             </div>
             
-            <p class="text-slate-500 text-xs sm:text-sm mb-6">Set your target focus time. Everything else will be hidden to keep you zeroed in.</p>
+            <p class="text-slate-500 text-xs sm:text-sm mb-6">Set your target focus time. Controls will automatically hide to keep you zeroed in.</p>
             
             <div class="flex gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <!-- Hours Input -->
                 <div class="flex-1">
                     <label class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">Hours</label>
                     <input type="number" id="input-hours" min="0" max="12" value="2" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xl sm:text-2xl font-bold rounded-xl px-3 py-3 sm:px-4 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                 </div>
                 <div class="flex items-center pt-5 sm:pt-6 text-xl sm:text-2xl font-bold text-slate-300">:</div>
-                <!-- Minutes Input -->
                 <div class="flex-1">
                     <label class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">Minutes</label>
                     <input type="number" id="input-minutes" min="0" max="59" value="0" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xl sm:text-2xl font-bold rounded-xl px-3 py-3 sm:px-4 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
@@ -355,11 +357,15 @@
         </div>
     </div>
 
-    <!-- Fullscreen Focus Timer Overlay -->
-    <div id="focus-overlay" class="fixed inset-0 focus-bg z-50 hidden flex-col items-center justify-center opacity-0 transition-opacity duration-500">
+    <div id="focus-overlay" class="fixed inset-0 focus-bg z-50 hidden flex-col items-center justify-center opacity-0 transition-opacity duration-500 cursor-default">
         
-        <!-- The Massive Centered Timer Text -->
-        <div id="focus-time-display" class="focus-text">
+        <!-- Double Tap Hint -->
+        <div id="focus-hint" class="absolute top-10 sm:top-16 text-slate-500/80 font-semibold text-xs sm:text-sm tracking-widest uppercase flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
+            Double tap to show controls
+        </div>
+
+        <div id="focus-time-display" class="focus-text pointer-events-none">
             2:00:00
         </div>
         
@@ -367,24 +373,22 @@
             Session Completed!
         </div>
 
-        <!-- Professional Controls Bar (Replaces old top-right exit button) -->
+        <!-- Controls Bar with Auto-hide -->
         <div id="focus-controls" class="absolute bottom-12 sm:bottom-16 w-full px-6 flex flex-col items-center gap-6">
-            
-            <!-- Real-time session stats -->
-            <div id="focus-session-stats" class="text-slate-400 text-xs sm:text-sm font-medium tracking-wide">
-                Session Active
+            <div id="focus-session-stats" class="text-slate-400 text-xs sm:text-sm font-medium tracking-wide bg-black/50 px-4 py-1.5 rounded-full backdrop-blur-sm">
+                Session Active • Live Syncing
             </div>
 
             <div class="flex items-center gap-4 sm:gap-6">
                 <!-- Pause/Resume Button -->
-                <button id="toggle-pause-btn" onclick="togglePauseFocusTimer()" class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-6 py-3.5 rounded-full font-bold transition-all active:scale-95 min-w-[140px] shadow-lg">
+                <button id="toggle-pause-btn" onclick="togglePauseFocusTimer(event)" class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-6 py-3.5 rounded-full font-bold transition-all active:scale-95 min-w-[140px] shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
                     <svg id="icon-pause" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                     <svg id="icon-resume" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     <span id="text-pause-resume">Pause</span>
                 </button>
                 
                 <!-- Stop Button -->
-                <button onclick="promptStopTimer()" class="flex items-center justify-center p-3.5 sm:px-6 bg-rose-900/40 border border-rose-800 hover:bg-rose-600 text-white rounded-full font-bold transition-all active:scale-95 shadow-lg group">
+                <button onclick="promptStopTimer(event)" class="flex items-center justify-center p-3.5 sm:px-6 bg-rose-900/40 border border-rose-800 hover:bg-rose-600 text-white rounded-full font-bold transition-all active:scale-95 shadow-[0_8px_30px_rgb(0,0,0,0.5)] group">
                     <svg class="w-5 h-5 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>
                     <span class="hidden sm:inline">End Session</span>
                 </button>
@@ -392,14 +396,13 @@
         </div>
     </div>
 
-    <!-- Stop Confirmation Modal (Custom alert alternative) -->
     <div id="stop-confirm-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4 transition-opacity opacity-0">
         <div class="bg-slate-900 border border-slate-700 p-6 sm:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl transform scale-95 transition-transform duration-300" id="stop-modal-content">
             <div class="w-16 h-16 bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </div>
             <h3 class="text-white text-xl sm:text-2xl font-bold mb-2">End Session Early?</h3>
-            <p class="text-slate-400 text-sm mb-8">Your studied time will be saved, but the timer will stop.</p>
+            <p class="text-slate-400 text-sm mb-8">Your studied time is already saved securely.</p>
             <div class="flex gap-3">
                 <button onclick="cancelStopTimer()" class="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">Resume</button>
                 <button onclick="confirmStopTimer()" class="flex-1 px-4 py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold transition-colors shadow-lg">End Session</button>
@@ -408,7 +411,6 @@
     </div>
 
     <script>
-        // --- 1. SYLLABUS DATA & TRACKER LOGIC ---
         const syllabus = {
             physics: [
                 { id: "phy-1", name: "Electric Charges and Fields" },
@@ -525,6 +527,7 @@
             document.getElementById('bio-stats').innerText = `${stats.biology.done}/${stats.biology.total}`;
         }
 
+        // Target Date Timer (Feb 1st)
         function initExactTimer() {
             const now = new Date();
             let targetYear = now.getFullYear();
@@ -561,55 +564,101 @@
             setInterval(timerTick, 1000);
         }
 
-        // --- NEW: Persistent Study Analytics ---
-        function getLocalISODate() {
-            const now = new Date();
-            return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+        function getLocalISODate(dateObj = new Date()) {
+            return new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split('T')[0];
         }
 
-        function loadAnalytics() {
-            const rawData = localStorage.getItem('class12_study_analytics');
-            let data = rawData ? JSON.parse(rawData) : {};
-            const todayStr = getLocalISODate();
+        function getAnalyticsData() {
+            const rawData = localStorage.getItem('class12_study_analytics_v3');
+            return rawData ? JSON.parse(rawData) : {};
+        }
 
-            if (!data[todayStr]) {
-                data[todayStr] = { totalTimeSeconds: 0, sessionsCount: 0, sessions: [] };
-            }
+        function saveAnalyticsData(data) {
+            localStorage.setItem('class12_study_analytics_v3', JSON.stringify(data));
+        }
+
+        function loadAnalyticsUI() {
+            const data = getAnalyticsData();
+            const todayStr = getLocalISODate();
+            const todayData = data[todayStr] || { totalTimeSeconds: 0, sessionsCount: 0 };
             
-            // Update UI
-            const todayData = data[todayStr];
+            // Update Dashboard Text
             let h = Math.floor(todayData.totalTimeSeconds / 3600);
             let m = Math.floor((todayData.totalTimeSeconds % 3600) / 60);
             document.getElementById('today-study-time').innerText = `${h}h ${m}m`;
             document.getElementById('today-sessions-count').innerText = `${todayData.sessionsCount} Session${todayData.sessionsCount !== 1 ? 's' : ''}`;
             
-            return data;
+            renderWeeklyChart(data);
         }
 
-        function saveSessionAnalytics(startMs, endMs, activeDurationSeconds) {
-            if (activeDurationSeconds < 10) return; // Ignore very short accidental sessions (<10s)
+        function renderWeeklyChart(data) {
+            const chartContainer = document.getElementById('weekly-chart');
+            chartContainer.innerHTML = '';
             
-            let data = loadAnalytics();
-            const dateStr = getLocalISODate(); // Ensures it gets saved to the day it finished
+            const today = new Date();
+            const last7Days = [];
+            let maxSeconds = 1; // Prevent div by 0
 
-            if (!data[dateStr]) {
-                data[dateStr] = { totalTimeSeconds: 0, sessionsCount: 0, sessions: [] };
+            // Generate last 7 dates
+            for(let i=6; i>=0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const dateStr = getLocalISODate(d);
+                const seconds = data[dateStr] ? data[dateStr].totalTimeSeconds : 0;
+                last7Days.push({ dateStr, seconds, dayName: d.toLocaleDateString('en-US', {weekday: 'narrow'}) });
+                if (seconds > maxSeconds) maxSeconds = seconds;
             }
 
-            data[dateStr].totalTimeSeconds += Math.floor(activeDurationSeconds);
-            data[dateStr].sessionsCount += 1;
-            data[dateStr].sessions.push({
-                start: startMs,
-                end: endMs,
-                activeDuration: activeDurationSeconds
+            // Create bars
+            last7Days.forEach((day, index) => {
+                const heightPercent = Math.max((day.seconds / maxSeconds) * 100, 5); // min height 5% for visibility
+                const isToday = index === 6;
+                const barColor = isToday ? 'bg-indigo-500' : (day.seconds > 0 ? 'bg-indigo-300' : 'bg-slate-200');
+                
+                const col = document.createElement('div');
+                col.className = 'flex flex-col items-center justify-end h-full w-full flex-1 group relative';
+                
+                // Tooltip on hover
+                let tooltipMins = Math.floor(day.seconds / 60);
+                let tooltipText = tooltipMins >= 60 ? `${Math.floor(tooltipMins/60)}h ${tooltipMins%60}m` : `${tooltipMins}m`;
+                
+                col.innerHTML = `
+                    <div class="absolute -top-8 bg-slate-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                        ${tooltipText}
+                    </div>
+                    <div class="w-full ${barColor} rounded-sm chart-bar" style="height: ${day.seconds > 0 ? heightPercent : 5}%;"></div>
+                    <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase">${day.dayName}</span>
+                `;
+                chartContainer.appendChild(col);
             });
-
-            localStorage.setItem('class12_study_analytics', JSON.stringify(data));
-            loadAnalytics(); // Refresh UI
         }
 
+        // Live syncing function
+        function syncLiveSessionAnalytics(elapsedSeconds) {
+            if (elapsedSeconds <= 0) return;
+            let data = getAnalyticsData();
+            const todayStr = getLocalISODate();
 
-        // --- NEW: Screen Wake Lock API ---
+            if (!data[todayStr]) {
+                data[todayStr] = { totalTimeSeconds: 0, sessionsCount: 0 };
+            }
+            
+            data[todayStr].totalTimeSeconds += elapsedSeconds;
+            saveAnalyticsData(data);
+            loadAnalyticsUI(); // Update dashboard behind the scenes seamlessly
+        }
+
+        function startNewSessionCount() {
+            let data = getAnalyticsData();
+            const todayStr = getLocalISODate();
+            if (!data[todayStr]) {
+                data[todayStr] = { totalTimeSeconds: 0, sessionsCount: 0 };
+            }
+            data[todayStr].sessionsCount += 1;
+            saveAnalyticsData(data);
+            loadAnalyticsUI();
+        }
+
         let wakeLock = null;
 
         async function requestWakeLock() {
@@ -619,7 +668,6 @@
                     wakeLock.addEventListener('release', () => {
                         console.log('Wake Lock released');
                     });
-                    console.log('Wake Lock acquired');
                 }
             } catch (err) {
                 console.error(`Wake Lock error: ${err.name}, ${err.message}`);
@@ -633,7 +681,6 @@
             }
         }
 
-        // Re-acquire lock if page becomes visible while timer is running
         document.addEventListener('visibilitychange', async () => {
             if (document.visibilityState === 'visible' && document.body.classList.contains('focus-active') && !isTimerPaused) {
                 await requestWakeLock();
@@ -641,7 +688,6 @@
         });
 
 
-        // --- 2. ENHANCED FOCUS TIMER LOGIC ---
         const modal = document.getElementById('focus-setup-modal');
         const modalContent = document.getElementById('focus-modal-content');
         const overlay = document.getElementById('focus-overlay');
@@ -649,21 +695,21 @@
         const doneMsg = document.getElementById('focus-done-msg');
         const themeColorMeta = document.getElementById('theme-color-meta');
         const controls = document.getElementById('focus-controls');
-        
-        // Modal for Confirm Stop
+        const hint = document.getElementById('focus-hint');
         const stopModal = document.getElementById('stop-confirm-modal');
         const stopModalContent = document.getElementById('stop-modal-content');
 
         let focusInterval;
         let targetTotalSeconds = 0;
         
-        // Accurate timing variables
-        let sessionStartTimeMs = 0;
         let expectedEndTimeMs = 0;
-        let totalPausedTimeMs = 0;
-        let lastPauseTimeMs = 0;
+        let lastLiveSaveMs = 0; // For exact live saving increments
         let isTimerPaused = false;
         let isTimerFinished = false;
+        
+        // Auto-Hide properties
+        let controlsTimeout = null;
+        let lastTapTime = 0;
 
         function openFocusSetup() {
             modal.classList.remove('hidden');
@@ -700,19 +746,19 @@
         async function activateFocusMode() {
             // Reset state
             doneMsg.classList.add('hidden');
-            controls.classList.remove('hidden');
             display.classList.remove('text-emerald-400');
             display.classList.add('text-white');
-            document.getElementById('focus-session-stats').innerText = "Session Active";
+            document.getElementById('focus-session-stats').innerText = "Session Active • Live Syncing";
             
-            // Accurate Timing Initialization
-            sessionStartTimeMs = Date.now();
-            expectedEndTimeMs = sessionStartTimeMs + (targetTotalSeconds * 1000);
-            totalPausedTimeMs = 0;
+            // Initialization
+            const now = Date.now();
+            expectedEndTimeMs = now + (targetTotalSeconds * 1000);
+            lastLiveSaveMs = now;
             isTimerPaused = false;
             isTimerFinished = false;
-            updatePauseUI(); // Reset buttons
-
+            
+            startNewSessionCount(); // Increment session counter
+            updatePauseUI(); 
             updateDisplayString(targetTotalSeconds);
 
             // UI Transitions
@@ -721,24 +767,55 @@
             document.body.classList.add('focus-active'); 
             themeColorMeta.setAttribute('content', '#000000'); 
             
-            // Fullscreen attempt
             const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => console.log(err));
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen().catch(err => console.log(err));
-            }
+            if (elem.requestFullscreen) elem.requestFullscreen().catch(err => console.log(err));
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen().catch(err => console.log(err));
             
             window.scrollTo(0, 0);
             await requestWakeLock();
 
             setTimeout(() => {
                 overlay.classList.remove('opacity-0');
+                showControls(); // Triggers auto-hide sequence initially
             }, 10);
 
             clearInterval(focusInterval);
-            focusInterval = setInterval(focusTick, 200); // Check multiple times a second for better UI responsiveness
+            focusInterval = setInterval(focusTick, 200); 
         }
+
+        function showControls() {
+            controls.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            hint.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
+            
+            clearTimeout(controlsTimeout);
+            
+            // Only auto-hide if timer is actively running
+            if (!isTimerPaused && !isTimerFinished) {
+                controlsTimeout = setTimeout(() => {
+                    hideControls();
+                }, 5000);
+            }
+        }
+
+        function hideControls() {
+            controls.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            hint.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+        }
+
+        // Universal Double Tap / Double Click listener on the overlay
+        overlay.addEventListener('click', (e) => {
+            // Do not trigger if they clicked an actual button inside controls
+            if (e.target.closest('#focus-controls') || e.target.closest('#focus-done-msg')) return;
+            
+            const currentTime = Date.now();
+            const tapGap = currentTime - lastTapTime;
+            
+            if (tapGap < 400 && tapGap > 0) { // 400ms threshold for double click/tap
+                showControls();
+            }
+            lastTapTime = currentTime;
+        });
+
 
         function focusTick() {
             if (isTimerPaused || isTimerFinished) return;
@@ -747,7 +824,17 @@
             const remainingMs = expectedEndTimeMs - now;
             const remainingSeconds = Math.ceil(remainingMs / 1000);
 
+            // Live Sync Every 5 seconds roughly
+            if (now - lastLiveSaveMs >= 5000) {
+                const elapsedSinceLastSave = Math.floor((now - lastLiveSaveMs) / 1000);
+                syncLiveSessionAnalytics(elapsedSinceLastSave);
+                lastLiveSaveMs = now;
+            }
+
             if (remainingMs <= 0) {
+                // Final sync for remainder
+                const remainder = Math.floor((now - lastLiveSaveMs) / 1000);
+                syncLiveSessionAnalytics(remainder);
                 handleTimerCompletion();
             } else {
                 updateDisplayString(remainingSeconds);
@@ -770,25 +857,32 @@
             display.innerText = timeString;
         }
 
-        function togglePauseFocusTimer() {
+        function togglePauseFocusTimer(e) {
+            if(e) e.stopPropagation(); // prevent double tap interference
             if (isTimerFinished) return;
 
+            const now = Date.now();
+            
             if (isTimerPaused) {
-                // Resume
-                const pauseDuration = Date.now() - lastPauseTimeMs;
-                totalPausedTimeMs += pauseDuration;
-                expectedEndTimeMs += pauseDuration; // Push end time forward
+                // Resuming
+                const pauseDuration = now - lastLiveSaveMs; // lastLiveSaveMs doubled as pause start time
+                expectedEndTimeMs += pauseDuration; 
+                lastLiveSaveMs = now; // Reset live tracking anchor
                 isTimerPaused = false;
-                document.getElementById('focus-session-stats').innerText = "Session Active";
-                
-                requestWakeLock(); // Re-acquire on resume
+                document.getElementById('focus-session-stats').innerText = "Session Active • Live Syncing";
+                requestWakeLock(); 
+                showControls(); // Will reset the 5s auto-hide timer
             } else {
-                // Pause
-                isTimerPaused = true;
-                lastPauseTimeMs = Date.now();
-                document.getElementById('focus-session-stats').innerText = "Session Paused";
+                // Pausing
+                // Sync exact remaining time before pausing
+                const exactElapsed = Math.floor((now - lastLiveSaveMs) / 1000);
+                syncLiveSessionAnalytics(exactElapsed);
                 
-                releaseWakeLock(); // Save battery while paused
+                isTimerPaused = true;
+                lastLiveSaveMs = now; // Store the exact pause time
+                document.getElementById('focus-session-stats').innerText = "Session Paused";
+                releaseWakeLock(); 
+                showControls(); // Shows controls permanently while paused
             }
             
             updatePauseUI();
@@ -821,28 +915,22 @@
             
             doneMsg.classList.remove('hidden');
             document.getElementById('focus-session-stats').innerText = "Target Achieved!";
-            
-            // Hide pause button when done, keep Stop button as "Exit"
             document.getElementById('toggle-pause-btn').classList.add('hidden');
             
             releaseWakeLock();
-
-            // Calculate exact active time
-            const actualDurationSeconds = targetTotalSeconds; // Completed fully
-            saveSessionAnalytics(sessionStartTimeMs, Date.now(), actualDurationSeconds);
+            showControls(); // Show controls permanently at end
         }
 
-        function promptStopTimer() {
+        function promptStopTimer(e) {
+            if(e) e.stopPropagation();
             if (isTimerFinished) {
-                // If already finished, just exit without confirming
                 finalizeExit();
                 return;
             }
             
-            // Implicitly pause timer while asking
+            // Implicitly pause timer to avoid losing sync accuracy while asking
             if (!isTimerPaused) togglePauseFocusTimer(); 
 
-            // Show custom confirmation modal
             stopModal.classList.remove('hidden');
             setTimeout(() => {
                 stopModal.classList.remove('opacity-0');
@@ -858,21 +946,12 @@
             setTimeout(() => {
                 stopModal.classList.add('hidden');
             }, 300);
-            
-            // Note: Does not automatically resume, user must hit 'Resume' on the main control
+            // User must hit 'Resume' manually
         }
 
         function confirmStopTimer() {
-            // Hide modal instantly
             stopModal.classList.add('hidden');
             stopModal.classList.add('opacity-0');
-            
-            // Save partial analytics
-            const activeDurationMs = Date.now() - sessionStartTimeMs - totalPausedTimeMs;
-            const activeDurationSeconds = Math.floor(activeDurationMs / 1000);
-            
-            saveSessionAnalytics(sessionStartTimeMs, Date.now(), activeDurationSeconds);
-            
             finalizeExit();
         }
 
@@ -880,17 +959,15 @@
             clearInterval(focusInterval);
             isTimerFinished = true;
             document.body.classList.remove('focus-paused');
+            clearTimeout(controlsTimeout);
             
             releaseWakeLock();
             
             overlay.classList.add('opacity-0');
             
             if (document.fullscreenElement || document.webkitFullscreenElement) {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen().catch(()=>{});
-                } else if (document.webkitExitFullscreen) { 
-                    document.webkitExitFullscreen().catch(()=>{});
-                }
+                if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(()=>{});
             }
 
             setTimeout(() => {
@@ -899,20 +976,14 @@
                 document.body.classList.remove('focus-active');
                 themeColorMeta.setAttribute('content', '#4f46e5'); 
                 
-                // Reset toggle button visibility for next time
+                // Reset controls styling for next time
                 document.getElementById('toggle-pause-btn').classList.remove('hidden');
+                controls.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                hint.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
             }, 500);
         }
 
-        // Removed Escape key listener for exiting focus to enforce proper stop confirmation workflow
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (!modal.classList.contains('hidden')) closeFocusSetup();
-            }
-        });
 
-
-        // --- 3. PWA (DOWNLOAD AS APP) LOGIC ---
         function initPWA() {
             const manifestJSON = {
                 "name": "Class 12 Tracker",
@@ -937,7 +1008,7 @@
             `;
             const swBlob = new Blob([swCode], {type: 'text/javascript'});
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>console.log('SW registration bypassed in preview'));
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>console.log('SW registration bypassed'));
             }
 
             let deferredPrompt;
@@ -958,8 +1029,6 @@
                             installBtn.classList.add('hidden');
                         }
                         deferredPrompt = null;
-                    } else {
-                        alert("To install, use the browser's menu ('Add to Home Screen' or 'Install App').");
                     }
                 });
             }
@@ -972,7 +1041,7 @@
             renderList('biology', 'biology-list');
             updateDashboard();
             initExactTimer(); 
-            loadAnalytics(); // Load today's stats on init
+            loadAnalyticsUI(); // Renders Today's info and the 7-day chart
             initPWA();
         };
     </script>
