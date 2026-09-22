@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,1043 +8,593 @@
     <meta id="theme-color-meta" name="theme-color" content="#4f46e5">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Tracker">
+    <meta name="apple-mobile-web-app-title" content="Class 12th Tracker">
+
+    <!-- Favicons with Custom Logo -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
     <!-- Dynamic Manifest Link for PWA -->
     <link id="manifest-link" rel="manifest">
-    
-    <title>Class 12 Board Exam Tracker</title>
-    
-    <!-- Tailwind CSS -->
+
+    <title>Class 12th Tracker - Better Than Yesterday</title>
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-            padding: 12px 14px;
-            border-radius: 12px;
-            transition: all 0.2s ease;
-            background: white;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 8px;
-        }
-        
-        @media (min-width: 640px) {
-            .checkbox-container {
-                padding: 14px 16px;
-                margin-bottom: 10px;
-            }
-        }
-        
-        .checkbox-container:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .checkbox-container input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-
-        .checkmark {
-            height: 22px;
-            width: 22px;
-            background-color: #f1f5f9;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            flex-shrink: 0;
-        }
-        
-        @media (min-width: 640px) {
-            .checkmark { margin-right: 16px; }
-        }
-
-        .checkbox-container:hover input ~ .checkmark {
-            border-color: #94a3b8;
-        }
-
-        .checkbox-container input:checked ~ .checkmark {
-            background-color: #10b981;
-            border-color: #10b981;
-        }
-
-        .checkmark:after {
-            content: "";
-            display: none;
-            width: 6px;
-            height: 12px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-            margin-bottom: 2px;
-        }
-
-        .checkbox-container input:checked ~ .checkmark:after {
-            display: block;
-        }
-
-        .checkbox-container .chapter-text {
-            color: #334155;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-            line-height: 1.3;
-        }
-        
-        @media (min-width: 640px) {
-            .checkbox-container .chapter-text { font-size: 0.95rem; }
-        }
-
-        .checkbox-container input:checked ~ .chapter-text {
-            color: #94a3b8;
-            text-decoration: line-through;
-        }
-
-        #progress-fill {
-            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes subtlePulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.95); }
-        }
-        .timer-colon {
-            animation: subtlePulse 1s infinite;
-        }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-
-        .focus-bg {
-            background-color: #000000; 
-        }
-        
-        .focus-text {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-weight: bold;
-            font-size: clamp(4rem, 22vw, 35rem);
-            color: #ffffff;
-            letter-spacing: -0.02em;
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.3s ease;
-        }
-
-        body.focus-active {
-            overflow: hidden;
-            background-color: #000000; 
-        }
-
-        @keyframes blinker {
-            50% { opacity: 0.5; }
-        }
-        .focus-paused .focus-text {
-            animation: blinker 2s linear infinite;
-            color: #cbd5e1;
-        }
-
-        /* Auto-hide transition for controls */
-        #focus-controls, #focus-hint {
-            transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-        
-        /* Bar chart animation */
-        .chart-bar {
-            transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- External Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="text-slate-800 pb-10 sm:pb-20 selection:bg-indigo-100 selection:text-indigo-900">
+<body class="text-slate-800 pb-12 sm:pb-24 selection:bg-indigo-100 selection:text-indigo-900">
 
-    <div class="max-w-5xl mx-auto px-3 sm:px-4 pt-6 md:pt-12 relative z-10" id="main-content">
-        
-        <div class="glass-panel rounded-3xl p-5 sm:p-6 md:p-10 shadow-lg border border-slate-200 mb-8 sm:mb-10 relative overflow-hidden">
-            
-            <button id="install-app-btn" class="hidden absolute top-4 sm:top-6 right-4 sm:right-6 bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 z-20">
-                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                Install App
-            </button>
+    <div class="max-w-5xl mx-auto px-3 sm:px-4 pt-4 md:pt-8 relative z-10" id="main-content">
 
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 lg:gap-8 mb-2">
-                <div class="w-full lg:w-[50%] mt-6 sm:mt-0">
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-2 tracking-tight leading-tight">Mission Board <span class="text-indigo-600 block sm:inline">Exams</span></h1>
-                    
-                    <p class="text-slate-500 font-medium mb-5 sm:mb-6 text-xs sm:text-sm md:text-base italic border-l-4 border-indigo-400 pl-3">
-                        "Success is the sum of small efforts, repeated day in and day out."
+        <!-- Header with Custom App Logo and Segmented Switcher -->
+        <header class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
+            <div class="flex items-center gap-3">
+                <div class="relative group">
+                    <img src="logo.png" alt="Class 12th Tracker Logo"
+                        class="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl shadow-md shadow-indigo-500/20 object-cover border border-indigo-100/60 transition-transform duration-300 group-hover:scale-105">
+                    <div class="absolute inset-0 rounded-2xl bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="text-lg sm:text-xl font-black text-slate-900 leading-tight tracking-tight">
+                            Class 12<span class="text-indigo-600">th</span> Tracker
+                        </h1>
+                        <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            Pro
+                        </span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-slate-400 font-semibold flex items-center gap-1.5">
+                        <span class="italic text-indigo-500">"Better Than Yesterday"</span>
+                        <span class="text-slate-300">•</span>
+                        <span>PCM / PCB</span>
                     </p>
-
-                    <div>
-                        <div class="flex justify-between items-end mb-2">
-                            <p class="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest">Syllabus Covered</p>
-                            <span id="percentage-text" class="text-2xl sm:text-3xl font-black text-emerald-500 leading-none">0%</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 sm:h-3 mb-2 sm:mb-3 overflow-hidden shadow-inner">
-                            <div id="progress-fill" class="bg-gradient-to-r from-emerald-400 to-emerald-500 h-full rounded-full w-0 shadow-md"></div>
-                        </div>
-                        <div class="flex justify-between text-xs sm:text-sm font-medium">
-                            <span class="text-slate-500"><span id="completed-count" class="text-slate-800 font-bold">0</span> Done</span>
-                            <span class="text-slate-500"><span id="remaining-count" class="text-rose-500 font-bold">0</span> Left</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 sm:mt-8">
-                        <button onclick="openFocusSetup()" class="group relative inline-flex items-center justify-center px-4 py-3 sm:px-6 sm:py-3.5 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:shadow-md active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 w-full sm:w-auto text-sm sm:text-base">
-                            <span class="mr-2 text-lg sm:text-xl">⏱️</span> 
-                            Start Deep Study Session
-                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="w-full lg:w-[45%] flex flex-col gap-4">
-                    
-                    <!-- 7-Day Analytics Card -->
-                    <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
-                            <div>
-                                <h3 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Focus</h3>
-                                <div class="flex items-baseline gap-2">
-                                    <span id="today-study-time" class="text-xl sm:text-2xl font-black text-indigo-600">0h 0m</span>
-                                    <span id="today-sessions-count" class="text-xs font-semibold text-slate-400">0 Sessions</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <h3 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Last 7 Days</h3>
-                            </div>
-                        </div>
-                        
-                        <!-- 7-Day Chart -->
-                        <div class="flex items-end justify-between gap-1 sm:gap-2 h-16 sm:h-20" id="weekly-chart">
-                            <!-- Bars generated by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Target Countdown -->
-                    <div class="bg-gradient-to-br from-white to-indigo-50/50 rounded-2xl p-4 sm:p-5 border border-indigo-100/50 shadow-sm relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-100 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity -mr-8 -mt-8 pointer-events-none"></div>
-                        
-                        <div class="flex items-center justify-center gap-2 mb-3 sm:mb-4 relative z-10">
-                            <span class="text-lg sm:text-xl">🎯</span>
-                            <h3 class="text-xs sm:text-sm font-bold text-indigo-900 uppercase tracking-widest">Target: Feb 1st</h3>
-                        </div>
-                        
-                        <div class="flex justify-center items-center gap-1.5 sm:gap-3 text-center relative z-10">
-                            <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-sm border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
-                                <span id="timer-days" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
-                                <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Days</p>
-                            </div>
-                            <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
-                            <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-sm border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
-                                <span id="timer-hours" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
-                                <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Hrs</p>
-                            </div>
-                            <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
-                            <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-sm border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
-                                <span id="timer-minutes" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
-                                <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Mins</p>
-                            </div>
-                            <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
-                            <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-sm border border-rose-50 min-w-[60px] sm:min-w-[70px]">
-                                <span id="timer-seconds" class="text-xl sm:text-3xl font-black text-rose-500 block leading-none mb-1">00</span>
-                                <p class="text-[9px] sm:text-[10px] font-bold text-rose-400 uppercase tracking-wider">Secs</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
-            <!-- Physics -->
-            <div class="subject-col bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100">
-                <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
-                    <h2 class="text-lg sm:text-xl font-extrabold text-blue-600 flex items-center gap-2">
-                        <span class="text-xl sm:text-2xl bg-blue-50 p-1.5 sm:p-2 rounded-lg">⚡</span> Physics
-                    </h2>
-                    <div class="text-right">
-                        <span id="phy-stats" class="block text-base sm:text-lg font-black text-blue-700 leading-none">0/14</span>
-                        <span class="text-[9px] sm:text-[10px] font-bold text-blue-400 uppercase">Chapters</span>
-                    </div>
-                </div>
-                <div id="physics-list" class="space-y-1 sm:space-y-2"></div>
-            </div>
+            <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                <!-- Navigation Tabs (SPA Switcher) -->
+                <nav class="flex bg-slate-200/80 p-1 rounded-2xl shadow-inner border border-slate-200/80 text-xs sm:text-sm font-bold w-full sm:w-auto" aria-label="Exam Sections">
+                    <button id="tab-btn-board" onclick="switchSection('board')"
+                        class="nav-tab-btn active flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl text-indigo-600 bg-white shadow-sm transition-all duration-200">
+                        <span>🎓</span>
+                        <span>Board Exams</span>
+                    </button>
+                    <button id="tab-btn-halfyearly" onclick="switchSection('halfyearly')"
+                        class="nav-tab-btn flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition-all duration-200">
+                        <span>📅</span>
+                        <span>Half Yearly</span>
+                        <span class="ml-1 bg-amber-100 text-amber-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded-md hidden sm:inline-block">Oct 15</span>
+                    </button>
+                </nav>
 
-            <!-- Chemistry -->
-            <div class="subject-col bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100">
-                <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
-                    <h2 class="text-lg sm:text-xl font-extrabold text-purple-600 flex items-center gap-2">
-                        <span class="text-xl sm:text-2xl bg-purple-50 p-1.5 sm:p-2 rounded-lg">🧪</span> Chemistry
-                    </h2>
-                    <div class="text-right">
-                        <span id="chem-stats" class="block text-base sm:text-lg font-black text-purple-700 leading-none">0/10</span>
-                        <span class="text-[9px] sm:text-[10px] font-bold text-purple-400 uppercase">Chapters</span>
-                    </div>
-                </div>
-                <div id="chemistry-list" class="space-y-1 sm:space-y-2"></div>
-            </div>
-
-            <!-- Biology -->
-            <div class="subject-col bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 md:col-span-2 lg:col-span-1">
-                <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
-                    <h2 class="text-lg sm:text-xl font-extrabold text-green-600 flex items-center gap-2">
-                        <span class="text-xl sm:text-2xl bg-green-50 p-1.5 sm:p-2 rounded-lg">🧬</span> Biology
-                    </h2>
-                    <div class="text-right">
-                        <span id="bio-stats" class="block text-base sm:text-lg font-black text-green-700 leading-none">0/13</span>
-                        <span class="text-[9px] sm:text-[10px] font-bold text-green-400 uppercase">Chapters</span>
-                    </div>
-                </div>
-                <div id="biology-list" class="space-y-1 sm:space-y-2"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="focus-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4 transition-opacity opacity-0">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl transform scale-95 transition-transform duration-300" id="focus-modal-content">
-            <div class="flex justify-between items-center mb-5 sm:mb-6">
-                <h3 class="text-xl sm:text-2xl font-black text-slate-800">Set Study Timer</h3>
-                <button onclick="closeFocusSetup()" class="text-slate-400 hover:text-rose-500 transition-colors p-1">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <!-- PWA Install Button -->
+                <button id="install-app-btn"
+                    class="hidden bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 px-3 py-2 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 flex-shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span class="hidden md:inline">Install App</span>
                 </button>
             </div>
-            
-            <p class="text-slate-500 text-xs sm:text-sm mb-6">Set your target focus time. Controls will automatically hide to keep you zeroed in.</p>
-            
-            <div class="flex gap-3 sm:gap-4 mb-6 sm:mb-8">
+        </header>
+
+        <!-- Global Search / Chapter Filter Bar -->
+        <div class="mb-6 relative">
+            <div class="relative flex items-center">
+                <span class="absolute left-4 text-slate-400 text-sm">🔍</span>
+                <input type="text" id="chapter-search-input" oninput="handleChapterSearch(event)"
+                    placeholder="Search chapters (e.g., Optics, Current, Solutions, Electrochemistry)..."
+                    class="w-full bg-white/90 backdrop-blur-sm border border-slate-200 hover:border-slate-300 focus:border-indigo-500 rounded-2xl pl-11 pr-4 py-2.5 text-xs sm:text-sm font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 shadow-xs transition-all">
+            </div>
+        </div>
+
+        <!-- ================================================================ -->
+        <!-- SECTION 1: BOARD / FULL SYLLABUS TRACKER VIEW                     -->
+        <!-- ================================================================ -->
+        <main id="board-view" class="section-fade">
+            <!-- Board Hero Dashboard Card -->
+            <div class="glass-panel rounded-3xl p-5 sm:p-6 md:p-10 shadow-lg border border-slate-200/80 mb-8 sm:mb-10 relative overflow-hidden">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 lg:gap-8 mb-2">
+                    <div class="w-full lg:w-[50%]">
+                        <div class="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold mb-3 border border-indigo-100">
+                            <span>🏆</span> Full 37-Chapter Board Coverage
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-2 tracking-tight leading-tight">
+                            Mission Board <span class="text-indigo-600 block sm:inline">Exams</span>
+                        </h2>
+
+                        <p class="text-slate-500 font-medium mb-5 sm:mb-6 text-xs sm:text-sm md:text-base italic border-l-4 border-indigo-400 pl-3">
+                            "Success is the sum of small efforts, repeated day in and day out."
+                        </p>
+
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <p class="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest">Syllabus Covered</p>
+                                <span id="percentage-text" class="text-2xl sm:text-3xl font-black text-emerald-500 leading-none">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2.5 sm:h-3 mb-2 sm:mb-3 overflow-hidden shadow-inner">
+                                <div id="progress-fill" class="progress-bar-animated bg-gradient-to-r from-emerald-400 to-emerald-500 h-full rounded-full w-0 shadow-md"></div>
+                            </div>
+                            <div class="flex justify-between text-xs sm:text-sm font-medium">
+                                <span class="text-slate-500"><span id="completed-count" class="text-slate-800 font-bold">0</span> Done</span>
+                                <span class="text-slate-500"><span id="remaining-count" class="text-rose-500 font-bold">37</span> Left (Total 37)</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 sm:mt-8">
+                            <button onclick="openFocusSetup()"
+                                class="group relative inline-flex items-center justify-center px-5 py-3.5 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-2xl hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 w-full sm:w-auto text-sm sm:text-base">
+                                <span class="mr-2 text-lg sm:text-xl">⏱️</span>
+                                Start Deep Study Session
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-[45%] flex flex-col gap-4">
+                        <!-- Enhanced 7-Day Analytics Card -->
+                        <div class="bg-slate-50/90 rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-xs">
+                            <div class="flex justify-between items-center mb-3">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Focus</h3>
+                                        <span id="study-streak-badge" class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-full">
+                                            🔥 0 Day Streak
+                                        </span>
+                                    </div>
+                                    <div class="flex items-baseline gap-2 mt-0.5">
+                                        <span id="today-study-time" class="text-xl sm:text-2xl font-black text-indigo-600">0h 0m</span>
+                                        <span id="today-sessions-count" class="text-xs font-semibold text-slate-400">0 Sessions</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <h3 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">7-Day Total</h3>
+                                    <span id="weekly-total-time" class="text-xs sm:text-sm font-bold text-slate-700 block">0h 0m</span>
+                                </div>
+                            </div>
+
+                            <!-- 7-Day Chart with Hover Tooltips -->
+                            <div class="flex items-end justify-between gap-1 sm:gap-2 h-16 sm:h-20" id="weekly-chart">
+                                <!-- Bars generated dynamically by script.js -->
+                            </div>
+                        </div>
+
+                        <!-- Board Exam Target Countdown (Target: Feb 1st) -->
+                        <div class="bg-gradient-to-br from-white to-indigo-50/60 rounded-2xl p-4 sm:p-5 border border-indigo-100/60 shadow-xs relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-100 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity -mr-8 -mt-8 pointer-events-none"></div>
+
+                            <div class="flex items-center justify-between mb-3 relative z-10">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg sm:text-xl">🎯</span>
+                                    <h3 class="text-xs sm:text-sm font-bold text-indigo-900 uppercase tracking-widest">Target: Feb 1st</h3>
+                                </div>
+                                <span class="text-[10px] sm:text-xs font-bold bg-indigo-100/80 text-indigo-700 px-2 py-0.5 rounded-md">
+                                    Final Boards
+                                </span>
+                            </div>
+
+                            <div class="flex justify-center items-center gap-1.5 sm:gap-3 text-center relative z-10">
+                                <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-xs border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
+                                    <span id="timer-days" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Days</p>
+                                </div>
+                                <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                                <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-xs border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
+                                    <span id="timer-hours" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Hrs</p>
+                                </div>
+                                <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                                <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-xs border border-indigo-50 min-w-[60px] sm:min-w-[70px]">
+                                    <span id="timer-minutes" class="text-xl sm:text-3xl font-black text-indigo-600 block leading-none mb-1">00</span>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Mins</p>
+                                </div>
+                                <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                                <div class="bg-white px-2 py-2 sm:px-3 sm:py-3 rounded-xl shadow-xs border border-rose-50 min-w-[60px] sm:min-w-[70px]">
+                                    <span id="timer-seconds" class="text-xl sm:text-3xl font-black text-rose-500 block leading-none mb-1">00</span>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-rose-400 uppercase tracking-wider">Secs</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Board Syllabus Subject Columns (37 Chapters Total) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
+                <!-- Physics (14 Chapters) -->
+                <div class="subject-col bg-white p-4 sm:p-5 rounded-3xl shadow-xs border border-slate-100 hover:border-blue-200">
+                    <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
+                        <h2 class="text-lg sm:text-xl font-extrabold text-blue-600 flex items-center gap-2">
+                            <span class="text-xl sm:text-2xl bg-blue-50 p-1.5 sm:p-2 rounded-xl">⚡</span> Physics
+                        </h2>
+                        <div class="text-right">
+                            <span id="phy-stats" class="block text-base sm:text-lg font-black text-blue-700 leading-none">0/14</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-blue-400 uppercase">Chapters</span>
+                        </div>
+                    </div>
+                    <div id="physics-list" class="space-y-1 sm:space-y-2"></div>
+                </div>
+
+                <!-- Chemistry (10 Chapters) -->
+                <div class="subject-col bg-white p-4 sm:p-5 rounded-3xl shadow-xs border border-slate-100 hover:border-purple-200">
+                    <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
+                        <h2 class="text-lg sm:text-xl font-extrabold text-purple-600 flex items-center gap-2">
+                            <span class="text-xl sm:text-2xl bg-purple-50 p-1.5 sm:p-2 rounded-xl">🧪</span> Chemistry
+                        </h2>
+                        <div class="text-right">
+                            <span id="chem-stats" class="block text-base sm:text-lg font-black text-purple-700 leading-none">0/10</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-purple-400 uppercase">Chapters</span>
+                        </div>
+                    </div>
+                    <div id="chemistry-list" class="space-y-1 sm:space-y-2"></div>
+                </div>
+
+                <!-- Biology (13 Chapters) -->
+                <div class="subject-col bg-white p-4 sm:p-5 rounded-3xl shadow-xs border border-slate-100 md:col-span-2 lg:col-span-1 hover:border-green-200">
+                    <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
+                        <h2 class="text-lg sm:text-xl font-extrabold text-green-600 flex items-center gap-2">
+                            <span class="text-xl sm:text-2xl bg-green-50 p-1.5 sm:p-2 rounded-xl">🧬</span> Biology
+                        </h2>
+                        <div class="text-right">
+                            <span id="bio-stats" class="block text-base sm:text-lg font-black text-green-700 leading-none">0/13</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-green-400 uppercase">Chapters</span>
+                        </div>
+                    </div>
+                    <div id="biology-list" class="space-y-1 sm:space-y-2"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ================================================================ -->
+        <!-- SECTION 2: HALF YEARLY EXAMS TRACKER VIEW                         -->
+        <!-- ================================================================ -->
+        <main id="halfyearly-view" class="hidden">
+            <!-- Half Yearly Dashboard Hero Card -->
+            <div class="glass-panel rounded-3xl p-5 sm:p-6 md:p-10 shadow-lg border border-slate-200/80 mb-8 sm:mb-10 relative overflow-hidden">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 lg:gap-8 mb-2">
+                    <div class="w-full lg:w-[50%]">
+                        <div class="inline-flex items-center gap-2 bg-amber-50 text-amber-800 px-3 py-1 rounded-full text-xs font-bold mb-3 border border-amber-200">
+                            <span>📅</span> Targeted Midterm Focus
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-2 tracking-tight leading-tight">
+                            Half Yearly <span class="text-indigo-600 block sm:inline">Exams</span>
+                        </h2>
+
+                        <p class="text-slate-500 font-medium mb-5 sm:mb-6 text-xs sm:text-sm md:text-base italic border-l-4 border-amber-400 pl-3">
+                            "Every chapter you master now guarantees peak confidence in the exam hall."
+                        </p>
+
+                        <!-- Overall Half Yearly Progress -->
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <p class="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest">Syllabus Covered</p>
+                                <span id="hy-percentage-text" class="text-2xl sm:text-3xl font-black text-emerald-500 leading-none">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2.5 sm:h-3 mb-2 sm:mb-3 overflow-hidden shadow-inner">
+                                <div id="hy-progress-fill" class="progress-bar-animated bg-gradient-to-r from-emerald-400 to-emerald-500 h-full rounded-full w-0 shadow-md"></div>
+                            </div>
+                            <div class="flex justify-between text-xs sm:text-sm font-medium">
+                                <span class="text-slate-500"><span id="hy-completed-count" class="text-slate-800 font-bold">0</span> Done</span>
+                                <span class="text-slate-500"><span id="hy-remaining-count" class="text-rose-500 font-bold">19</span> Left (Total 19)</span>
+                            </div>
+                        </div>
+
+                        <!-- Start Deep Study Session Button -->
+                        <div class="mt-6 sm:mt-8">
+                            <button onclick="openFocusSetup()"
+                                class="group relative inline-flex items-center justify-center px-5 py-3.5 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-2xl hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 w-full sm:w-auto text-sm sm:text-base">
+                                <span class="mr-2 text-lg sm:text-xl">⏱️</span>
+                                Start Deep Study Session
+                                <svg class="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-[45%] flex flex-col gap-4">
+                        <!-- Half Yearly Countdown Card (October 15, 2026) -->
+                        <div class="bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 text-white rounded-2xl p-5 sm:p-6 border border-indigo-700/50 shadow-xl relative overflow-hidden group">
+                            <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-indigo-500/25 rounded-full blur-2xl pointer-events-none"></div>
+
+                            <div class="flex items-center justify-between mb-4 relative z-10">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">⏳</span>
+                                    <div>
+                                        <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-indigo-200">Time Left</h3>
+                                        <p class="text-[11px] text-slate-300 font-semibold">Half Yearly Starts: 15 October 2026</p>
+                                    </div>
+                                </div>
+                                <span class="bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                                    Midterm
+                                </span>
+                            </div>
+
+                            <div class="flex justify-center items-center gap-1.5 sm:gap-3 text-center relative z-10">
+                                <div class="bg-white/10 backdrop-blur-md px-2 py-2 sm:px-3 sm:py-3 rounded-xl border border-white/15 min-w-[60px] sm:min-w-[70px]">
+                                    <span id="hy-timer-days" class="text-xl sm:text-3xl font-black text-white block leading-none mb-1">00</span>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Days</p>
+                                </div>
+                                <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                                <div class="bg-white/10 backdrop-blur-md px-2 py-2 sm:px-3 sm:py-3 rounded-xl border border-white/15 min-w-[60px] sm:min-w-[70px]">
+                                    <span id="hy-timer-hours" class="text-xl sm:text-3xl font-black text-white block leading-none mb-1">00</span>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Hrs</p>
+                                </div>
+                                <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                                <div class="bg-white/10 backdrop-blur-md px-2 py-2 sm:px-3 sm:py-3 rounded-xl border border-white/15 min-w-[60px] sm:min-w-[70px]">
+                                    <span id="hy-timer-minutes" class="text-xl sm:text-3xl font-black text-white block leading-none mb-1">00</span>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Mins</p>
+                                </div>
+                                <span class="text-lg sm:text-xl font-bold text-indigo-300 timer-colon mt-[-15px] sm:mt-[-20px]">:</span>
+                                <div class="bg-white/10 backdrop-blur-md px-2 py-2 sm:px-3 sm:py-3 rounded-xl border border-rose-500/30 min-w-[60px] sm:min-w-[70px]">
+                                    <span id="hy-timer-seconds" class="text-xl sm:text-3xl font-black text-rose-400 block leading-none mb-1">00</span>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-rose-300 uppercase tracking-wider">Secs</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Half Yearly Quick Subject Stats -->
+                        <div class="bg-slate-50/90 rounded-2xl p-4 border border-slate-100 shadow-xs grid grid-cols-3 gap-2">
+                            <!-- Physics Mini -->
+                            <div class="bg-white p-2.5 rounded-xl border border-blue-100 text-center shadow-xs">
+                                <span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider block">Physics</span>
+                                <span id="hy-phy-stats" class="text-base sm:text-lg font-black text-blue-700 block">0/8</span>
+                                <div class="w-full bg-blue-50 rounded-full h-1.5 mt-1 overflow-hidden">
+                                    <div id="hy-phy-progress-fill" class="bg-blue-500 h-full rounded-full w-0 progress-bar-animated"></div>
+                                </div>
+                            </div>
+                            <!-- Chemistry Mini -->
+                            <div class="bg-white p-2.5 rounded-xl border border-purple-100 text-center shadow-xs">
+                                <span class="text-[10px] font-bold text-purple-500 uppercase tracking-wider block">Chemistry</span>
+                                <span id="hy-chem-stats" class="text-base sm:text-lg font-black text-purple-700 block">0/5</span>
+                                <div class="w-full bg-purple-50 rounded-full h-1.5 mt-1 overflow-hidden">
+                                    <div id="hy-chem-progress-fill" class="bg-purple-500 h-full rounded-full w-0 progress-bar-animated"></div>
+                                </div>
+                            </div>
+                            <!-- Biology Mini -->
+                            <div class="bg-white p-2.5 rounded-xl border border-green-100 text-center shadow-xs">
+                                <span class="text-[10px] font-bold text-green-500 uppercase tracking-wider block">Biology</span>
+                                <span id="hy-bio-stats" class="text-base sm:text-lg font-black text-green-700 block">0/6</span>
+                                <div class="w-full bg-green-50 rounded-full h-1.5 mt-1 overflow-hidden">
+                                    <div id="hy-bio-progress-fill" class="bg-green-500 h-full rounded-full w-0 progress-bar-animated"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Half Yearly Selected Chapters (19 Chapters Total) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
+                <!-- Physics (8 Chapters: Ch 1 to 8) -->
+                <div class="subject-col bg-white p-4 sm:p-5 rounded-3xl shadow-xs border border-slate-100 hover:border-blue-200">
+                    <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
+                        <h2 class="text-lg sm:text-xl font-extrabold text-blue-600 flex items-center gap-2">
+                            <span class="text-xl sm:text-2xl bg-blue-50 p-1.5 sm:p-2 rounded-xl">⚡</span> Physics
+                        </h2>
+                        <div class="text-right">
+                            <span id="hy-col-phy-stats" class="block text-base sm:text-lg font-black text-blue-700 leading-none">0/8</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-blue-400 uppercase">Ch 1 - 8</span>
+                        </div>
+                    </div>
+                    <div id="hy-physics-list" class="space-y-1 sm:space-y-2"></div>
+                </div>
+
+                <!-- Chemistry (5 Chapters: Ch 1 to 5) -->
+                <div class="subject-col bg-white p-4 sm:p-5 rounded-3xl shadow-xs border border-slate-100 hover:border-purple-200">
+                    <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
+                        <h2 class="text-lg sm:text-xl font-extrabold text-purple-600 flex items-center gap-2">
+                            <span class="text-xl sm:text-2xl bg-purple-50 p-1.5 sm:p-2 rounded-xl">🧪</span> Chemistry
+                        </h2>
+                        <div class="text-right">
+                            <span id="hy-col-chem-stats" class="block text-base sm:text-lg font-black text-purple-700 leading-none">0/5</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-purple-400 uppercase">Ch 1 - 5</span>
+                        </div>
+                    </div>
+                    <div id="hy-chemistry-list" class="space-y-1 sm:space-y-2"></div>
+                </div>
+
+                <!-- Biology (6 Chapters: Ch 4, 7, 11, 12, 13, 8) -->
+                <div class="subject-col bg-white p-4 sm:p-5 rounded-3xl shadow-xs border border-slate-100 md:col-span-2 lg:col-span-1 hover:border-green-200">
+                    <div class="flex items-center justify-between mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-slate-100">
+                        <h2 class="text-lg sm:text-xl font-extrabold text-green-600 flex items-center gap-2">
+                            <span class="text-xl sm:text-2xl bg-green-50 p-1.5 sm:p-2 rounded-xl">🧬</span> Biology
+                        </h2>
+                        <div class="text-right">
+                            <span id="hy-col-bio-stats" class="block text-base sm:text-lg font-black text-green-700 leading-none">0/6</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-green-400 uppercase">Selected</span>
+                        </div>
+                    </div>
+                    <div id="hy-biology-list" class="space-y-1 sm:space-y-2"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- SHARED FOCUS TIMER SETUP MODAL (WITH QUICK PRESETS)                  -->
+    <!-- ==================================================================== -->
+    <div id="focus-setup-modal"
+        class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-40 hidden flex items-center justify-center p-4 transition-opacity opacity-0">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl transform scale-95 transition-transform duration-300 border border-slate-100"
+            id="focus-modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">⏱️</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-800">Set Study Timer</h3>
+                </div>
+                <button onclick="closeFocusSetup()" class="text-slate-400 hover:text-rose-500 transition-colors p-1.5 rounded-lg hover:bg-slate-100">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <p class="text-slate-500 text-xs sm:text-sm mb-5">
+                Pick a quick preset or type your custom session time. Distraction-free mode auto-hides controls.
+            </p>
+
+            <!-- Quick Presets -->
+            <div class="mb-5">
+                <label class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Quick Presets</label>
+                <div class="grid grid-cols-4 gap-2 text-center text-xs font-bold">
+                    <button id="preset-25" type="button" onclick="setTimerPreset(25)"
+                        class="timer-preset-btn py-2 px-1 rounded-xl bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600">
+                        25m
+                    </button>
+                    <button id="preset-45" type="button" onclick="setTimerPreset(45)"
+                        class="timer-preset-btn py-2 px-1 rounded-xl bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600">
+                        45m
+                    </button>
+                    <button id="preset-60" type="button" onclick="setTimerPreset(60)"
+                        class="timer-preset-btn py-2 px-1 rounded-xl bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600">
+                        1 hr
+                    </button>
+                    <button id="preset-120" type="button" onclick="setTimerPreset(120)"
+                        class="timer-preset-btn py-2 px-1 rounded-xl bg-indigo-600 text-white shadow-xs">
+                        2 hr
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Hours & Minutes Input -->
+            <div class="flex gap-3 sm:gap-4 mb-6 sm:mb-7">
                 <div class="flex-1">
                     <label class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">Hours</label>
-                    <input type="number" id="input-hours" min="0" max="12" value="2" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xl sm:text-2xl font-bold rounded-xl px-3 py-3 sm:px-4 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <input type="number" id="input-hours" min="0" max="12" value="2"
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xl sm:text-2xl font-bold rounded-xl px-3 py-3 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                 </div>
                 <div class="flex items-center pt-5 sm:pt-6 text-xl sm:text-2xl font-bold text-slate-300">:</div>
                 <div class="flex-1">
                     <label class="block text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">Minutes</label>
-                    <input type="number" id="input-minutes" min="0" max="59" value="0" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xl sm:text-2xl font-bold rounded-xl px-3 py-3 sm:px-4 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <input type="number" id="input-minutes" min="0" max="59" value="0"
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xl sm:text-2xl font-bold rounded-xl px-3 py-3 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                 </div>
             </div>
-            
-            <button onclick="startFocusTimerFromInput()" class="w-full bg-slate-900 text-white font-bold py-3.5 sm:py-4 rounded-xl hover:bg-indigo-600 transition-colors text-base sm:text-lg shadow-lg active:scale-95">
-                Begin Focus
+
+            <button onclick="startFocusTimerFromInput()"
+                class="w-full bg-indigo-600 text-white font-bold py-3.5 sm:py-4 rounded-xl hover:bg-indigo-500 transition-colors text-base sm:text-lg shadow-lg shadow-indigo-600/25 active:scale-95">
+                Begin Deep Focus
             </button>
         </div>
     </div>
 
-    <div id="focus-overlay" class="fixed inset-0 focus-bg z-50 hidden flex-col items-center justify-center opacity-0 transition-opacity duration-500 cursor-default">
-        
+    <!-- ==================================================================== -->
+    <!-- FULLSCREEN FOCUS STUDY OVERLAY (WITH LIVE TOP PROGRESS BAR)          -->
+    <!-- ==================================================================== -->
+    <div id="focus-overlay"
+        class="fixed inset-0 focus-bg z-50 hidden flex-col items-center justify-center opacity-0 transition-opacity duration-500 cursor-default">
+
+        <!-- Top Live Elapsed Progress Bar -->
+        <div id="focus-session-progress"></div>
+
         <!-- Double Tap Hint -->
-        <div id="focus-hint" class="absolute top-10 sm:top-16 text-slate-500/80 font-semibold text-xs sm:text-sm tracking-widest uppercase flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
-            Double tap to show controls
+        <div id="focus-hint"
+            class="absolute top-10 sm:top-16 text-slate-400/80 font-semibold text-xs sm:text-sm tracking-widest uppercase flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+            <svg class="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+            </svg>
+            Double tap anywhere to show controls
         </div>
 
         <div id="focus-time-display" class="focus-text pointer-events-none">
             2:00:00
         </div>
-        
-        <div id="focus-done-msg" class="absolute top-1/4 text-emerald-400 font-bold text-xl sm:text-2xl tracking-widest uppercase hidden animate-bounce text-center px-4">
-            Session Completed!
+
+        <div id="focus-done-msg"
+            class="absolute top-1/4 text-emerald-400 font-extrabold text-2xl sm:text-3xl tracking-widest uppercase hidden animate-bounce text-center px-4 drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]">
+            🎉 Session Completed! Great Work!
         </div>
 
         <!-- Controls Bar with Auto-hide -->
         <div id="focus-controls" class="absolute bottom-12 sm:bottom-16 w-full px-6 flex flex-col items-center gap-6">
-            <div id="focus-session-stats" class="text-slate-400 text-xs sm:text-sm font-medium tracking-wide bg-black/50 px-4 py-1.5 rounded-full backdrop-blur-sm">
+            <div id="focus-session-stats"
+                class="text-slate-300 text-xs sm:text-sm font-semibold tracking-wide bg-slate-900/80 border border-slate-700/60 px-5 py-2 rounded-full backdrop-blur-md shadow-lg">
                 Session Active • Live Syncing
             </div>
 
             <div class="flex items-center gap-4 sm:gap-6">
                 <!-- Pause/Resume Button -->
-                <button id="toggle-pause-btn" onclick="togglePauseFocusTimer(event)" class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-6 py-3.5 rounded-full font-bold transition-all active:scale-95 min-w-[140px] shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
-                    <svg id="icon-pause" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                    <svg id="icon-resume" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <button id="toggle-pause-btn" onclick="togglePauseFocusTimer(event)"
+                    class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-7 py-3.5 rounded-full font-bold transition-all active:scale-95 min-w-[140px] shadow-[0_8px_30px_rgb(79,70,229,0.4)]">
+                    <svg id="icon-pause" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                    </svg>
+                    <svg id="icon-resume" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
                     <span id="text-pause-resume">Pause</span>
                 </button>
-                
+
                 <!-- Stop Button -->
-                <button onclick="promptStopTimer(event)" class="flex items-center justify-center p-3.5 sm:px-6 bg-rose-900/40 border border-rose-800 hover:bg-rose-600 text-white rounded-full font-bold transition-all active:scale-95 shadow-[0_8px_30px_rgb(0,0,0,0.5)] group">
-                    <svg class="w-5 h-5 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>
+                <button onclick="promptStopTimer(event)"
+                    class="flex items-center justify-center p-3.5 sm:px-6 bg-rose-950/50 border border-rose-800/80 hover:bg-rose-600 text-rose-200 hover:text-white rounded-full font-bold transition-all active:scale-95 shadow-[0_8px_30px_rgb(0,0,0,0.5)] group">
+                    <svg class="w-5 h-5 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                    </svg>
                     <span class="hidden sm:inline">End Session</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="stop-confirm-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4 transition-opacity opacity-0">
-        <div class="bg-slate-900 border border-slate-700 p-6 sm:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl transform scale-95 transition-transform duration-300" id="stop-modal-content">
-            <div class="w-16 h-16 bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+    <!-- ==================================================================== -->
+    <!-- STOP FOCUS TIMER CONFIRMATION MODAL                                  -->
+    <!-- ==================================================================== -->
+    <div id="stop-confirm-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4 transition-opacity opacity-0">
+        <div class="bg-slate-900 border border-slate-700/80 p-6 sm:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl transform scale-95 transition-transform duration-300"
+            id="stop-modal-content">
+            <div class="w-16 h-16 bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-rose-800/40">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
             </div>
             <h3 class="text-white text-xl sm:text-2xl font-bold mb-2">End Session Early?</h3>
-            <p class="text-slate-400 text-sm mb-8">Your studied time is already saved securely.</p>
+            <p class="text-slate-400 text-sm mb-8">All your focused study time is securely recorded and saved.</p>
             <div class="flex gap-3">
-                <button onclick="cancelStopTimer()" class="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">Resume</button>
-                <button onclick="confirmStopTimer()" class="flex-1 px-4 py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold transition-colors shadow-lg">End Session</button>
+                <button onclick="cancelStopTimer()"
+                    class="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors">
+                    Resume
+                </button>
+                <button onclick="confirmStopTimer()"
+                    class="flex-1 px-4 py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold transition-colors shadow-lg">
+                    End Session
+                </button>
             </div>
         </div>
     </div>
 
-    <script>
-        const syllabus = {
-            physics: [
-                { id: "phy-1", name: "Electric Charges and Fields" },
-                { id: "phy-2", name: "Electrostatic Potential and Capacitance" },
-                { id: "phy-3", name: "Current Electricity" },
-                { id: "phy-4", name: "Moving Charges and Magnetism" },
-                { id: "phy-5", name: "Magnetism and Matter" },
-                { id: "phy-6", name: "Electromagnetic Induction" },
-                { id: "phy-7", name: "Alternating Current" },
-                { id: "phy-8", name: "Electromagnetic Waves" },
-                { id: "phy-9", name: "Ray Optics and Optical Instruments" },
-                { id: "phy-10", name: "Wave Optics" },
-                { id: "phy-11", name: "Dual Nature of Radiation and Matter" },
-                { id: "phy-12", name: "Atoms" },
-                { id: "phy-13", name: "Nuclei" },
-                { id: "phy-14", name: "Semiconductor Electronics" }
-            ],
-            chemistry: [
-                { id: "chem-1", name: "Solutions" },
-                { id: "chem-2", name: "Electrochemistry" },
-                { id: "chem-3", name: "Chemical Kinetics" },
-                { id: "chem-4", name: "d -and f -Block Elements" },
-                { id: "chem-5", name: "Coordination Compounds" },
-                { id: "chem-6", name: "Haloalkanes and Haloarenes" },
-                { id: "chem-7", name: "Alcohols, Phenols and Ethers" },
-                { id: "chem-8", name: "Aldehydes, Ketones and Carboxylic Acids" },
-                { id: "chem-9", name: "Amines" },
-                { id: "chem-10", name: "Biomolecules" }
-            ],
-            biology: [
-                { id: "bio-1", name: "Sexual Reproduction in Flowering Plants" },
-                { id: "bio-2", name: "Human Reproduction" },
-                { id: "bio-3", name: "Reproductive Health" },
-                { id: "bio-4", name: "Principles of Inheritance and Variation" },
-                { id: "bio-5", name: "Molecular Basis of Inheritance" },
-                { id: "bio-6", name: "Evolution" },
-                { id: "bio-7", name: "Human Health and Disease" },
-                { id: "bio-8", name: "Microbes in Human Welfare" },
-                { id: "bio-9", name: "Biotechnology: Principles and Processes" },
-                { id: "bio-10", name: "Biotechnology and its Applications" },
-                { id: "bio-11", name: "Organisms and Populations" },
-                { id: "bio-12", name: "Ecosystem" },
-                { id: "bio-13", name: "Biodiversity and Conservation" }
-            ]
-        };
-
-        let completedChapters = JSON.parse(localStorage.getItem('class12_progress_v2')) || {};
-
-        function saveProgress() {
-            localStorage.setItem('class12_progress_v2', JSON.stringify(completedChapters));
-            updateDashboard();
-        }
-
-        function toggleChapter(id) {
-            if (completedChapters[id]) {
-                delete completedChapters[id];
-            } else {
-                completedChapters[id] = true;
-            }
-            saveProgress();
-        }
-
-        function renderList(subject, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = ''; 
-
-            syllabus[subject].forEach((chapter, index) => {
-                const isChecked = completedChapters[chapter.id] ? 'checked' : '';
-                
-                const label = document.createElement('label');
-                label.className = 'checkbox-container';
-                label.innerHTML = `
-                    <input type="checkbox" id="${chapter.id}" onchange="toggleChapter('${chapter.id}')" ${isChecked}>
-                    <span class="checkmark"></span>
-                    <span class="chapter-text flex-1">
-                        <span class="text-[10px] sm:text-xs text-slate-400 font-bold mr-1 sm:mr-2 inline-block w-4">${index + 1}.</span> 
-                        ${chapter.name}
-                    </span>
-                `;
-                container.appendChild(label);
-            });
-        }
-
-        function updateDashboard() {
-            let totalChapters = 0;
-            let totalCompleted = 0;
-            
-            const stats = {
-                physics: { total: syllabus.physics.length, done: 0 },
-                chemistry: { total: syllabus.chemistry.length, done: 0 },
-                biology: { total: syllabus.biology.length, done: 0 }
-            };
-
-            for (const subject in syllabus) {
-                totalChapters += syllabus[subject].length;
-                syllabus[subject].forEach(chapter => {
-                    if (completedChapters[chapter.id]) {
-                        totalCompleted++;
-                        stats[subject].done++;
-                    }
-                });
-            }
-
-            const remaining = totalChapters - totalCompleted;
-            const percentage = totalChapters === 0 ? 0 : Math.round((totalCompleted / totalChapters) * 100);
-
-            document.getElementById('percentage-text').innerText = `${percentage}%`;
-            document.getElementById('completed-count').innerText = totalCompleted;
-            document.getElementById('remaining-count').innerText = remaining;
-            document.getElementById('progress-fill').style.width = `${percentage}%`;
-
-            document.getElementById('phy-stats').innerText = `${stats.physics.done}/${stats.physics.total}`;
-            document.getElementById('chem-stats').innerText = `${stats.chemistry.done}/${stats.chemistry.total}`;
-            document.getElementById('bio-stats').innerText = `${stats.biology.done}/${stats.biology.total}`;
-        }
-
-        // Target Date Timer (Feb 1st)
-        function initExactTimer() {
-            const now = new Date();
-            let targetYear = now.getFullYear();
-            
-            if (now.getMonth() > 1 || (now.getMonth() === 1 && now.getDate() >= 1)) {
-                targetYear++;
-            }
-            
-            const targetDate = new Date(`February 1, ${targetYear} 00:00:00`).getTime();
-
-            const timerTick = () => {
-                const currentTime = new Date().getTime();
-                const timeDifference = targetDate - currentTime;
-
-                if (timeDifference > 0) {
-                    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
-                    document.getElementById('timer-days').innerText = days.toString().padStart(2, '0');
-                    document.getElementById('timer-hours').innerText = hours.toString().padStart(2, '0');
-                    document.getElementById('timer-minutes').innerText = minutes.toString().padStart(2, '0');
-                    document.getElementById('timer-seconds').innerText = seconds.toString().padStart(2, '0');
-                } else {
-                    document.getElementById('timer-days').innerText = "00";
-                    document.getElementById('timer-hours').innerText = "00";
-                    document.getElementById('timer-minutes').innerText = "00";
-                    document.getElementById('timer-seconds').innerText = "00";
-                }
-            };
-
-            timerTick(); 
-            setInterval(timerTick, 1000);
-        }
-
-        function getLocalISODate(dateObj = new Date()) {
-            return new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split('T')[0];
-        }
-
-        function getAnalyticsData() {
-            const rawData = localStorage.getItem('class12_study_analytics_v3');
-            return rawData ? JSON.parse(rawData) : {};
-        }
-
-        function saveAnalyticsData(data) {
-            localStorage.setItem('class12_study_analytics_v3', JSON.stringify(data));
-        }
-
-        function loadAnalyticsUI() {
-            const data = getAnalyticsData();
-            const todayStr = getLocalISODate();
-            const todayData = data[todayStr] || { totalTimeSeconds: 0, sessionsCount: 0 };
-            
-            // Update Dashboard Text
-            let h = Math.floor(todayData.totalTimeSeconds / 3600);
-            let m = Math.floor((todayData.totalTimeSeconds % 3600) / 60);
-            document.getElementById('today-study-time').innerText = `${h}h ${m}m`;
-            document.getElementById('today-sessions-count').innerText = `${todayData.sessionsCount} Session${todayData.sessionsCount !== 1 ? 's' : ''}`;
-            
-            renderWeeklyChart(data);
-        }
-
-        function renderWeeklyChart(data) {
-            const chartContainer = document.getElementById('weekly-chart');
-            chartContainer.innerHTML = '';
-            
-            const today = new Date();
-            const last7Days = [];
-            let maxSeconds = 1; // Prevent div by 0
-
-            // Generate last 7 dates
-            for(let i=6; i>=0; i--) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - i);
-                const dateStr = getLocalISODate(d);
-                const seconds = data[dateStr] ? data[dateStr].totalTimeSeconds : 0;
-                last7Days.push({ dateStr, seconds, dayName: d.toLocaleDateString('en-US', {weekday: 'narrow'}) });
-                if (seconds > maxSeconds) maxSeconds = seconds;
-            }
-
-            // Create bars
-            last7Days.forEach((day, index) => {
-                const heightPercent = Math.max((day.seconds / maxSeconds) * 100, 5); // min height 5% for visibility
-                const isToday = index === 6;
-                const barColor = isToday ? 'bg-indigo-500' : (day.seconds > 0 ? 'bg-indigo-300' : 'bg-slate-200');
-                
-                const col = document.createElement('div');
-                col.className = 'flex flex-col items-center justify-end h-full w-full flex-1 group relative';
-                
-                // Tooltip on hover
-                let tooltipMins = Math.floor(day.seconds / 60);
-                let tooltipText = tooltipMins >= 60 ? `${Math.floor(tooltipMins/60)}h ${tooltipMins%60}m` : `${tooltipMins}m`;
-                
-                col.innerHTML = `
-                    <div class="absolute -top-8 bg-slate-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                        ${tooltipText}
-                    </div>
-                    <div class="w-full ${barColor} rounded-sm chart-bar" style="height: ${day.seconds > 0 ? heightPercent : 5}%;"></div>
-                    <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase">${day.dayName}</span>
-                `;
-                chartContainer.appendChild(col);
-            });
-        }
-
-        // Live syncing function
-        function syncLiveSessionAnalytics(elapsedSeconds) {
-            if (elapsedSeconds <= 0) return;
-            let data = getAnalyticsData();
-            const todayStr = getLocalISODate();
-
-            if (!data[todayStr]) {
-                data[todayStr] = { totalTimeSeconds: 0, sessionsCount: 0 };
-            }
-            
-            data[todayStr].totalTimeSeconds += elapsedSeconds;
-            saveAnalyticsData(data);
-            loadAnalyticsUI(); // Update dashboard behind the scenes seamlessly
-        }
-
-        function startNewSessionCount() {
-            let data = getAnalyticsData();
-            const todayStr = getLocalISODate();
-            if (!data[todayStr]) {
-                data[todayStr] = { totalTimeSeconds: 0, sessionsCount: 0 };
-            }
-            data[todayStr].sessionsCount += 1;
-            saveAnalyticsData(data);
-            loadAnalyticsUI();
-        }
-
-        let wakeLock = null;
-
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    wakeLock.addEventListener('release', () => {
-                        console.log('Wake Lock released');
-                    });
-                }
-            } catch (err) {
-                console.error(`Wake Lock error: ${err.name}, ${err.message}`);
-            }
-        }
-
-        async function releaseWakeLock() {
-            if (wakeLock !== null) {
-                await wakeLock.release();
-                wakeLock = null;
-            }
-        }
-
-        document.addEventListener('visibilitychange', async () => {
-            if (document.visibilityState === 'visible' && document.body.classList.contains('focus-active') && !isTimerPaused) {
-                await requestWakeLock();
-            }
-        });
-
-
-        const modal = document.getElementById('focus-setup-modal');
-        const modalContent = document.getElementById('focus-modal-content');
-        const overlay = document.getElementById('focus-overlay');
-        const display = document.getElementById('focus-time-display');
-        const doneMsg = document.getElementById('focus-done-msg');
-        const themeColorMeta = document.getElementById('theme-color-meta');
-        const controls = document.getElementById('focus-controls');
-        const hint = document.getElementById('focus-hint');
-        const stopModal = document.getElementById('stop-confirm-modal');
-        const stopModalContent = document.getElementById('stop-modal-content');
-
-        let focusInterval;
-        let targetTotalSeconds = 0;
-        
-        let expectedEndTimeMs = 0;
-        let lastLiveSaveMs = 0; // For exact live saving increments
-        let isTimerPaused = false;
-        let isTimerFinished = false;
-        
-        // Auto-Hide properties
-        let controlsTimeout = null;
-        let lastTapTime = 0;
-
-        function openFocusSetup() {
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }, 10);
-        }
-
-        function closeFocusSetup() {
-            modal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        function startFocusTimerFromInput() {
-            let hours = parseInt(document.getElementById('input-hours').value) || 0;
-            let minutes = parseInt(document.getElementById('input-minutes').value) || 0;
-            
-            if (hours < 0) hours = 0;
-            if (minutes < 0) minutes = 0;
-            if (hours === 0 && minutes === 0) return; 
-
-            targetTotalSeconds = (hours * 3600) + (minutes * 60);
-            
-            closeFocusSetup();
-            activateFocusMode();
-        }
-
-        async function activateFocusMode() {
-            // Reset state
-            doneMsg.classList.add('hidden');
-            display.classList.remove('text-emerald-400');
-            display.classList.add('text-white');
-            document.getElementById('focus-session-stats').innerText = "Session Active • Live Syncing";
-            
-            // Initialization
-            const now = Date.now();
-            expectedEndTimeMs = now + (targetTotalSeconds * 1000);
-            lastLiveSaveMs = now;
-            isTimerPaused = false;
-            isTimerFinished = false;
-            
-            startNewSessionCount(); // Increment session counter
-            updatePauseUI(); 
-            updateDisplayString(targetTotalSeconds);
-
-            // UI Transitions
-            overlay.classList.remove('hidden');
-            overlay.classList.add('flex');
-            document.body.classList.add('focus-active'); 
-            themeColorMeta.setAttribute('content', '#000000'); 
-            
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) elem.requestFullscreen().catch(err => console.log(err));
-            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen().catch(err => console.log(err));
-            
-            window.scrollTo(0, 0);
-            await requestWakeLock();
-
-            setTimeout(() => {
-                overlay.classList.remove('opacity-0');
-                showControls(); // Triggers auto-hide sequence initially
-            }, 10);
-
-            clearInterval(focusInterval);
-            focusInterval = setInterval(focusTick, 200); 
-        }
-
-        function showControls() {
-            controls.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-            hint.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
-            
-            clearTimeout(controlsTimeout);
-            
-            // Only auto-hide if timer is actively running
-            if (!isTimerPaused && !isTimerFinished) {
-                controlsTimeout = setTimeout(() => {
-                    hideControls();
-                }, 5000);
-            }
-        }
-
-        function hideControls() {
-            controls.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-            hint.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
-        }
-
-        // Universal Double Tap / Double Click listener on the overlay
-        overlay.addEventListener('click', (e) => {
-            // Do not trigger if they clicked an actual button inside controls
-            if (e.target.closest('#focus-controls') || e.target.closest('#focus-done-msg')) return;
-            
-            const currentTime = Date.now();
-            const tapGap = currentTime - lastTapTime;
-            
-            if (tapGap < 400 && tapGap > 0) { // 400ms threshold for double click/tap
-                showControls();
-            }
-            lastTapTime = currentTime;
-        });
-
-
-        function focusTick() {
-            if (isTimerPaused || isTimerFinished) return;
-
-            const now = Date.now();
-            const remainingMs = expectedEndTimeMs - now;
-            const remainingSeconds = Math.ceil(remainingMs / 1000);
-
-            // Live Sync Every 5 seconds roughly
-            if (now - lastLiveSaveMs >= 5000) {
-                const elapsedSinceLastSave = Math.floor((now - lastLiveSaveMs) / 1000);
-                syncLiveSessionAnalytics(elapsedSinceLastSave);
-                lastLiveSaveMs = now;
-            }
-
-            if (remainingMs <= 0) {
-                // Final sync for remainder
-                const remainder = Math.floor((now - lastLiveSaveMs) / 1000);
-                syncLiveSessionAnalytics(remainder);
-                handleTimerCompletion();
-            } else {
-                updateDisplayString(remainingSeconds);
-            }
-        }
-
-        function updateDisplayString(totalSeconds) {
-            let h = Math.floor(totalSeconds / 3600);
-            let m = Math.floor((totalSeconds % 3600) / 60);
-            let s = Math.floor(totalSeconds % 60);
-
-            let timeString = "";
-            if (h > 0) {
-                timeString += h + ":";
-                timeString += m.toString().padStart(2, '0') + ":";
-            } else {
-                timeString += m.toString() + ":";
-            }
-            timeString += s.toString().padStart(2, '0');
-            display.innerText = timeString;
-        }
-
-        function togglePauseFocusTimer(e) {
-            if(e) e.stopPropagation(); // prevent double tap interference
-            if (isTimerFinished) return;
-
-            const now = Date.now();
-            
-            if (isTimerPaused) {
-                // Resuming
-                const pauseDuration = now - lastLiveSaveMs; // lastLiveSaveMs doubled as pause start time
-                expectedEndTimeMs += pauseDuration; 
-                lastLiveSaveMs = now; // Reset live tracking anchor
-                isTimerPaused = false;
-                document.getElementById('focus-session-stats').innerText = "Session Active • Live Syncing";
-                requestWakeLock(); 
-                showControls(); // Will reset the 5s auto-hide timer
-            } else {
-                // Pausing
-                // Sync exact remaining time before pausing
-                const exactElapsed = Math.floor((now - lastLiveSaveMs) / 1000);
-                syncLiveSessionAnalytics(exactElapsed);
-                
-                isTimerPaused = true;
-                lastLiveSaveMs = now; // Store the exact pause time
-                document.getElementById('focus-session-stats').innerText = "Session Paused";
-                releaseWakeLock(); 
-                showControls(); // Shows controls permanently while paused
-            }
-            
-            updatePauseUI();
-        }
-
-        function updatePauseUI() {
-            const btnText = document.getElementById('text-pause-resume');
-            const iconPause = document.getElementById('icon-pause');
-            const iconResume = document.getElementById('icon-resume');
-            
-            if (isTimerPaused) {
-                document.body.classList.add('focus-paused');
-                btnText.innerText = "Resume";
-                iconPause.classList.add('hidden');
-                iconResume.classList.remove('hidden');
-            } else {
-                document.body.classList.remove('focus-paused');
-                btnText.innerText = "Pause";
-                iconPause.classList.remove('hidden');
-                iconResume.classList.add('hidden');
-            }
-        }
-
-        function handleTimerCompletion() {
-            isTimerFinished = true;
-            clearInterval(focusInterval);
-            display.innerText = "0:00";
-            display.classList.remove('text-white');
-            display.classList.add('text-emerald-400'); 
-            
-            doneMsg.classList.remove('hidden');
-            document.getElementById('focus-session-stats').innerText = "Target Achieved!";
-            document.getElementById('toggle-pause-btn').classList.add('hidden');
-            
-            releaseWakeLock();
-            showControls(); // Show controls permanently at end
-        }
-
-        function promptStopTimer(e) {
-            if(e) e.stopPropagation();
-            if (isTimerFinished) {
-                finalizeExit();
-                return;
-            }
-            
-            // Implicitly pause timer to avoid losing sync accuracy while asking
-            if (!isTimerPaused) togglePauseFocusTimer(); 
-
-            stopModal.classList.remove('hidden');
-            setTimeout(() => {
-                stopModal.classList.remove('opacity-0');
-                stopModalContent.classList.remove('scale-95');
-                stopModalContent.classList.add('scale-100');
-            }, 10);
-        }
-
-        function cancelStopTimer() {
-            stopModal.classList.add('opacity-0');
-            stopModalContent.classList.remove('scale-100');
-            stopModalContent.classList.add('scale-95');
-            setTimeout(() => {
-                stopModal.classList.add('hidden');
-            }, 300);
-            // User must hit 'Resume' manually
-        }
-
-        function confirmStopTimer() {
-            stopModal.classList.add('hidden');
-            stopModal.classList.add('opacity-0');
-            finalizeExit();
-        }
-
-        function finalizeExit() {
-            clearInterval(focusInterval);
-            isTimerFinished = true;
-            document.body.classList.remove('focus-paused');
-            clearTimeout(controlsTimeout);
-            
-            releaseWakeLock();
-            
-            overlay.classList.add('opacity-0');
-            
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-                if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(()=>{});
-            }
-
-            setTimeout(() => {
-                overlay.classList.remove('flex'); 
-                overlay.classList.add('hidden');
-                document.body.classList.remove('focus-active');
-                themeColorMeta.setAttribute('content', '#4f46e5'); 
-                
-                // Reset controls styling for next time
-                document.getElementById('toggle-pause-btn').classList.remove('hidden');
-                controls.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                hint.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
-            }, 500);
-        }
-
-
-        function initPWA() {
-            const manifestJSON = {
-                "name": "Class 12 Tracker",
-                "short_name": "Tracker",
-                "start_url": window.location.href,
-                "display": "standalone",
-                "background_color": "#f8fafc",
-                "theme_color": "#4f46e5",
-                "icons": [{
-                    "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzRmNDZlNSIgcng9IjQ4Ii8+PHBhdGggZD0iTTUwIDEwMEwzNSA4NWwyNSAyNSA3MC03MC0xNS0xNXoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=",
-                    "sizes": "192x192",
-                    "type": "image/svg+xml"
-                }]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/manifest+json'});
-            document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
-
-            const swCode = `
-                self.addEventListener('install', (e) => self.skipWaiting());
-                self.addEventListener('activate', (e) => self.clients.claim());
-                self.addEventListener('fetch', (e) => {});
-            `;
-            const swBlob = new Blob([swCode], {type: 'text/javascript'});
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>console.log('SW registration bypassed'));
-            }
-
-            let deferredPrompt;
-            const installBtn = document.getElementById('install-app-btn');
-            
-            if (!window.matchMedia('(display-mode: standalone)').matches) {
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    deferredPrompt = e;
-                    installBtn.classList.remove('hidden');
-                });
-
-                installBtn.addEventListener('click', async () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        if (outcome === 'accepted') {
-                            installBtn.classList.add('hidden');
-                        }
-                        deferredPrompt = null;
-                    }
-                });
-            }
-        }
-
-        // Initialize App
-        window.onload = function() {
-            renderList('physics', 'physics-list');
-            renderList('chemistry', 'chemistry-list');
-            renderList('biology', 'biology-list');
-            updateDashboard();
-            initExactTimer(); 
-            loadAnalyticsUI(); // Renders Today's info and the 7-day chart
-            initPWA();
-        };
-    </script>
+    <!-- ==================================================================== -->
+    <!-- INTERACTIVE FLOATING TOAST NOTIFICATION                             -->
+    <!-- ==================================================================== -->
+    <div id="toast-notification"
+        class="fixed bottom-6 right-6 z-50 bg-slate-900/95 text-white px-5 py-3 rounded-2xl shadow-2xl border border-slate-700/60 backdrop-blur-md flex items-center gap-3 pointer-events-none">
+        <span id="toast-icon" class="text-lg">🎉</span>
+        <span id="toast-message" class="text-xs sm:text-sm font-semibold">Chapter marked complete!</span>
+    </div>
+
+    <!-- External JavaScript File -->
+    <script src="script.js" defer></script>
 </body>
+
 </html>
